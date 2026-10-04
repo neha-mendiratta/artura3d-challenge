@@ -64,7 +64,7 @@ Edge cases are never out of scope: see [conventions.md](conventions.md).
 - [x] 02 Pricing
 - [x] 03 Order workflow
 - [x] 04 API
-- [ ] 05 Async packet
+- [x] 05 Async packet
 - [ ] 06 Frontend
 - [ ] 07 3D preview
 

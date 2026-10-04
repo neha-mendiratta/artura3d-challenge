@@ -52,4 +52,4 @@ If no row is updated, the order either does not exist (404) or is not `Draft` (4
 
 ## Out of scope
 
-- Un-submitting or cancelling an order
+- Un-submitting or cancelling an order: the brief says submitted orders are immutable.

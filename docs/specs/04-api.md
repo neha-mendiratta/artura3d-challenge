@@ -85,7 +85,6 @@ Packet:
   "status": "Completed",
   "payload": { "…": "defined in spec 05" },
   "error": null,
-  "attempts": 1,
   "createdAt": "2026-10-04T09:22:05.903Z",
   "updatedAt": "2026-10-04T09:22:07.350Z"
 }
@@ -150,7 +149,7 @@ Workflow rules (edit/submit/quote by status) are tested in spec 03.
 
 ## Out of scope
 
-- Authentication
-- Searching orders
-- Deleting orders
-- API documentation page (Swagger)
+- Authentication: not in the brief; needed before production.
+- Searching orders: not in the brief; the list has a status filter and paging.
+- Deleting orders: not in the brief; manufacturing records are usually kept.
+- API documentation page (Swagger): not in the brief; this spec documents the API.

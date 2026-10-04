@@ -45,4 +45,4 @@ return expedite ? Math.round((subtotal * 115) / 100) : subtotal;
 
 ## Out of scope
 
-- Currency symbol, tax, discounts
+- Currency symbol, tax, discounts: the brief gives no currency, tax or discount rules.

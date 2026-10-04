@@ -56,7 +56,6 @@ Only the total is stored. The inputs (thickness, width, expedite) live on the or
 | `order_id` | uuid | Foreign key to `orders`. **Unique**: at most one packet per order |
 | `status` | enum `packet_status` | `Pending` \| `Completed` \| `Failed`. Default `Pending` |
 | `payload` | jsonb, nullable | Set only when `Completed` |
-| `attempts` | integer | Default `0`. Incremented on each processing attempt |
 | `error` | text, nullable | Last failure reason. Set only when `Failed` |
 | `created_at` | timestamptz | Default `now()` |
 | `updated_at` | timestamptz | Default `now()`. Every `UPDATE` statement sets `updated_at = now()` |
@@ -126,7 +125,7 @@ Beyond this (partitioning, archiving, read replicas, connection pooling) is list
 | Second quote inserted for the same order | Database rejects it (unique violation) | `rejects a second quote for the same order` |
 | Second packet inserted for the same order | Database rejects it (unique violation) | `rejects a second packet for the same order` |
 | Quote or packet for a non-existent order | Database rejects it (foreign key violation) | `rejects a quote for a non-existent order` |
-| Packet inserted without `status`, `attempts` | `status = Pending`, `attempts = 0`, `payload = null`, `error = null` | `creates a packet with status Pending and zero attempts` |
+| Packet inserted without `status` | `status = Pending`, `payload = null`, `error = null` | `creates a packet with status Pending` |
 | Dimension with 1 decimal place (e.g. `3.5`) | Stored as `3.5` and returned as the number `3.5` (not the string `"3.5"`) | `stores and returns 1-decimal dimensions as numbers` |
 | Dimension with more than 1 decimal place inserted directly (e.g. `3.55`) | Database rounds to `numeric(3,1)` precision. The API never sends this: it rejects it first (spec 04) | `rounds dimensions to 1 decimal place at the database` |
 | Order updated | `updated_at` changes, `created_at` does not | `updates updated_at but not created_at on update` |
@@ -137,7 +136,7 @@ Beyond this (partitioning, archiving, read replicas, connection pooling) is list
 ## Acceptance criteria
 
 1. SQL migrations create the `orders`, `quotes` and `manufacturing_packets` tables and the `order_status` and `packet_status` enums as described.
-2. Defaults apply as described (ids, timestamps, order status, expedite, packet status, attempts).
+2. Defaults apply as described (ids, timestamps, order status, expedite, packet status).
 3. A second quote or packet for the same order is rejected by the database.
 4. A quote or packet cannot reference a non-existent order.
 5. Dimensions are returned as numbers and 1-decimal values round-trip exactly.
@@ -146,10 +145,10 @@ Beyond this (partitioning, archiving, read replicas, connection pooling) is list
 
 ## Out of scope
 
-- Users, authentication, audit history
-- Deleting orders
-- Left/right foot, materials, other orthotic attributes
-- Storing the price breakdown on the quote
+- Users, authentication, audit history: not in the brief; needed before production.
+- Deleting orders: not in the brief; manufacturing records are usually kept.
+- Left/right foot, materials, other orthotic attributes: not in the brief; the brief's fields are enough for pricing and the 3D preview.
+- Storing the price breakdown on the quote: the order cannot change after submit, so the breakdown can always be recalculated.
 
 ## Resolved questions
 
