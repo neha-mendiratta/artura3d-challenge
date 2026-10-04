@@ -1,8 +1,10 @@
 import { OrderInput } from '@artura/shared';
-import { InferAttributes } from 'sequelize';
+import { InferAttributes, Op, WhereOptions } from 'sequelize';
+import { ORDERS_PAGE_SIZE } from '../constants';
 import { ConflictError, NotFoundError } from '../errors';
 import { Order } from '../models/order';
 import { Quote } from '../models/quote';
+import { OrderStatus } from '../types';
 
 export async function getOrder(id: string): Promise<Order> {
   const order = await Order.findByPk(id, { include: { model: Quote, as: 'quote' } });
@@ -10,6 +12,24 @@ export async function getOrder(id: string): Promise<Order> {
     throw new NotFoundError(`Order ${id} not found`);
   }
   return order;
+}
+
+// Newest first. uuidv7 ids are time-ordered, so the cursor is simply the last id of the previous page.
+// One extra row is fetched to know whether another page exists, without a COUNT(*).
+export async function listOrders(filter: { status?: OrderStatus; cursor?: string }) {
+  const where: WhereOptions<Order> = {};
+  if (filter.status) where.status = filter.status;
+  if (filter.cursor) where.id = { [Op.lt]: filter.cursor };
+
+  const rows = await Order.findAll({
+    where,
+    include: { model: Quote, as: 'quote' },
+    order: [['id', 'DESC']],
+    limit: ORDERS_PAGE_SIZE + 1,
+  });
+  const items = rows.slice(0, ORDERS_PAGE_SIZE);
+  const nextCursor = rows.length > ORDERS_PAGE_SIZE ? items[items.length - 1]!.id : null;
+  return { items, nextCursor };
 }
 
 export async function createOrder(input: OrderInput): Promise<Order> {

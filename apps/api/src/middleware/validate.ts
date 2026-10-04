@@ -4,9 +4,16 @@ import { ValidationError } from '../errors';
 
 const idSchema = z.uuid();
 
-// Each issue becomes "field: message", e.g. "widthMm: Too big: expected number to be <=150".
-function formatIssues(error: z.ZodError): string {
-  return error.issues.map((issue) => `${issue.path.join('.') || 'body'}: ${issue.message}`).join('; ');
+// Returns the parsed value, or throws a 400 listing each problem as "field: message".
+export function parseWith<T extends z.ZodType>(schema: T, value: unknown): z.infer<T> {
+  const result = schema.safeParse(value);
+  if (!result.success) {
+    const message = result.error.issues
+      .map((issue) => `${issue.path.join('.') || 'body'}: ${issue.message}`)
+      .join('; ');
+    throw new ValidationError(message);
+  }
+  return result.data;
 }
 
 export const validateId: RequestHandler = (req, _res, next) => {
@@ -18,11 +25,7 @@ export const validateId: RequestHandler = (req, _res, next) => {
 
 export function validateBody(schema: z.ZodType): RequestHandler {
   return (req, _res, next) => {
-    const result = schema.safeParse(req.body);
-    if (!result.success) {
-      throw new ValidationError(formatIssues(result.error));
-    }
-    req.body = result.data;
+    req.body = parseWith(schema, req.body);
     next();
   };
 }

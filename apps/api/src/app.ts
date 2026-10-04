@@ -4,13 +4,15 @@ import { NotFoundError } from './errors';
 import { logger } from './logger';
 import { errorHandler } from './middleware/error-handler';
 import { orderRoutes } from './routes/order-routes';
+import { packetRoutes } from './routes/packet-routes';
+import { quoteRoutes } from './routes/quote-routes';
 
 export const app = express();
 
 app.use(pinoHttp({ logger }));
 app.use(express.json());
 
-app.use('/orders', orderRoutes);
+app.use('/orders', orderRoutes, quoteRoutes, packetRoutes);
 
 app.use((_req, _res, next) => next(new NotFoundError('Route not found')));
 app.use(errorHandler);

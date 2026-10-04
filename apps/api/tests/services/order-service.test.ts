@@ -1,11 +1,10 @@
 import { orderInputSchema } from '@artura/shared';
 import { ConflictError, NotFoundError } from '../../src/errors';
 import { Order } from '../../src/models/order';
-import { submitOrder, updateNotes, updateOrder } from '../../src/services/order-service';
+import { listOrders, submitOrder, updateNotes, updateOrder } from '../../src/services/order-service';
 import { insertOrder, insertSubmittedOrder, resetDatabase } from '../helpers/db';
-import { validOrder } from '../helpers/fixtures';
+import { missingId, validOrder } from '../helpers/fixtures';
 
-const missingId = '01a104ee-0000-7000-8000-000000000000';
 const widerOrder = orderInputSchema.parse({ ...validOrder, widthMm: 100 });
 
 beforeEach(resetDatabase);
@@ -51,5 +50,32 @@ describe('order workflow', () => {
     const order = await insertSubmittedOrder();
     const updated = await updateNotes(order.id, 'Left foot only');
     expect(updated).toMatchObject({ notes: 'Left foot only', status: 'Submitted' });
+  });
+});
+
+describe('orders list', () => {
+  test('pages through orders', async () => {
+    const ids: string[] = [];
+    for (let i = 0; i < 25; i++) {
+      ids.push((await insertOrder()).id);
+    }
+
+    const first = await listOrders({});
+    expect(first.items).toHaveLength(20);
+    expect(first.items[0]?.id).toBe(ids[24]);
+
+    const second = await listOrders({ cursor: first.nextCursor! });
+    expect(second.items).toHaveLength(5);
+    expect(second.nextCursor).toBeNull();
+
+    const seen = [...first.items, ...second.items].map((order) => order.id);
+    expect(new Set(seen).size).toBe(25);
+  });
+
+  test('filters orders by status', async () => {
+    await insertOrder();
+    const submitted = await insertSubmittedOrder();
+    const { items } = await listOrders({ status: 'Submitted' });
+    expect(items.map((order) => order.id)).toEqual([submitted.id]);
   });
 });

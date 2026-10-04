@@ -3,3 +3,5 @@ export const BASE_PRICE_CENTS = 10_000;
 export const THICKNESS_RATE_CENTS_PER_MM = 200;
 export const WIDTH_RATE_CENTS_PER_MM = 50;
 export const EXPEDITE_PERCENT = 115;
+
+export const ORDERS_PAGE_SIZE = 20;

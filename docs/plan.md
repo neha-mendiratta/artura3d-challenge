@@ -73,7 +73,7 @@ Edge cases are never out of scope: see [conventions.md](conventions.md).
 - [x] Data model: migration and models
 - [x] Pricing
 - [x] Order workflow
-- [ ] API endpoints
+- [x] API endpoints
 - [ ] Async packet worker
 - [ ] API Dockerfile + `api` service in Docker Compose
 

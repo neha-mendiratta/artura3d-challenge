@@ -4,9 +4,8 @@ import { ManufacturingPacket } from '../../src/models/manufacturing-packet';
 import { Order } from '../../src/models/order';
 import { Quote } from '../../src/models/quote';
 import { insertOrder, resetDatabase } from '../helpers/db';
+import { missingId } from '../helpers/fixtures';
 import { runMigrations } from '../helpers/migrate';
-
-const missingOrderId = '01a104ee-0000-7000-8000-000000000000';
 
 const insertQuote = (orderId: string) => Quote.create({ orderId, totalCents: 17509 });
 
@@ -34,7 +33,7 @@ describe('data model', () => {
   });
 
   test('rejects a quote for a non-existent order', async () => {
-    await expect(insertQuote(missingOrderId)).rejects.toBeInstanceOf(ForeignKeyConstraintError);
+    await expect(insertQuote(missingId)).rejects.toBeInstanceOf(ForeignKeyConstraintError);
   });
 
   test('creates a packet with status Pending', async () => {

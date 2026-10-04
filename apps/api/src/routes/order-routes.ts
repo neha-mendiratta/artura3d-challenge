@@ -1,10 +1,27 @@
 import { NotesInput, notesInputSchema, OrderInput, orderInputSchema } from '@artura/shared';
 import { Router } from 'express';
+import { z } from 'zod';
+import { parseWith, validateBody, validateId } from '../middleware/validate';
+import {
+  createOrder,
+  getOrder,
+  listOrders,
+  submitOrder,
+  updateNotes,
+  updateOrder,
+} from '../services/order-service';
 import { OrderRequest } from '../types';
-import { validateBody, validateId } from '../middleware/validate';
-import { createOrder, getOrder, submitOrder, updateNotes, updateOrder } from '../services/order-service';
+
+const listQuerySchema = z.object({
+  status: z.enum(['Draft', 'Submitted']).optional(),
+  cursor: z.uuid().optional(),
+});
 
 export const orderRoutes = Router();
+
+orderRoutes.get('/', async (req, res) => {
+  res.json(await listOrders(parseWith(listQuerySchema, req.query)));
+});
 
 orderRoutes.post('/', validateBody(orderInputSchema), async (req, res) => {
   res.status(201).json(await createOrder(req.body as OrderInput));

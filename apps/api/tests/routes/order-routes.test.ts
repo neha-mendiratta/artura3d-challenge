@@ -1,14 +1,23 @@
 import request from 'supertest';
 import { app } from '../../src/app';
 import { Order } from '../../src/models/order';
-import { validOrder } from '../helpers/fixtures';
+import { missingId, validOrder } from '../helpers/fixtures';
 import { insertOrder, insertSubmittedOrder, resetDatabase } from '../helpers/db';
-
-const missingId = '01a104ee-0000-7000-8000-000000000000';
 
 beforeEach(resetDatabase);
 
 describe('orders API', () => {
+  test('lists orders', async () => {
+    const order = await insertOrder();
+    const res = await request(app).get('/orders').expect(200);
+    expect(res.body).toMatchObject({ items: [{ id: order.id, quote: null }], nextCursor: null });
+  });
+
+  test('rejects an invalid list query', async () => {
+    await request(app).get('/orders?status=Foo').expect(400);
+    await request(app).get('/orders?cursor=abc').expect(400);
+  });
+
   test('creates an order', async () => {
     const res = await request(app)
       .post('/orders')

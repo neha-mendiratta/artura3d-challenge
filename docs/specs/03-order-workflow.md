@@ -1,6 +1,6 @@
 # Order workflow
 
-Status: Approved
+Status: Implemented
 
 ## Source
 
@@ -49,7 +49,7 @@ If no row is updated, the order either does not exist (404) or is not `Draft` (4
 ## Acceptance criteria
 
 1. Orders follow the rules above.
-2. Every edge case above has a passing integration test (`tests/services/order-service.test.ts`).
+2. Every edge case above has a passing integration test (`tests/services/`).
 
 ## Out of scope
 
