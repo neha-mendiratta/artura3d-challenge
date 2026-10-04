@@ -4,7 +4,7 @@ Last updated: 2026-10-04
 
 ## Status
 
-Phase 0 (Setup) complete. Phase 1 (Specs) in progress. No application code yet.
+Phase 0 (Setup) and Phase 1 (Specs) complete. No application code yet.
 
 ## How to run
 
@@ -31,6 +31,7 @@ pgAdmin: host `localhost`, port `5432`, database `artura`, user `artura`, passwo
 - Spec 04 (API) approved: 6 brief endpoints + `GET /orders` and `PATCH /orders/{id}/notes`, one error format, idempotent quote
 - Spec 05 (async packet) approved: worker in the API process, `FOR UPDATE SKIP LOCKED`, Completed or Failed, no retries
 - Spec 06 (frontend) approved: orders list, new order and order pages; shared Zod validation; packet status polling
+- Spec 07 (3D preview) approved: box model sized and coloured from the form, orbit controls, WebGL cleanup, measurement labels
 - `docs/recommendations.md`: improvements beyond the brief, for the interview
 - `docs/plan.md`, `docs/conventions.md`, `docs/decisions.md`, spec templates `docs/specs/01–07`
 - Docker Compose: `db` (dev, persistent volume) and `db-test` (in-memory, tests only), Postgres 18
@@ -44,7 +45,7 @@ Nothing.
 
 ## Next step
 
-Write spec 07 (3D preview), then developer review.
+Phase 2, backend: start with the data model migrations (spec 01).
 
 ## Open questions
 

@@ -29,3 +29,5 @@ Short log. Newest at the bottom.
 | 23 | pino + pino-http for logging | Structured JSON logs; fast and actively maintained; `pino-http` logs every request with one line of setup | Bunyan (no longer actively developed, no request-logging package), winston (more configuration) |
 | 24 | React Router for pages | Standard routing for React; three pages with URLs that can be bookmarked | TanStack Router |
 | 25 | Mantine form for the order form | Part of the UI library already chosen; works with the shared Zod schema | react-hook-form |
+| 26 | Measurement labels as the extra 3D feature | Lets the user check the model against the prescription at a glance; small and clearly useful | Preset camera views, left/right foot mirroring |
+| 27 | `@react-three/test-renderer` for 3D tests | Renders the scene in Jest without a browser or graphics card, so size, colour and cleanup can be tested | Manual testing only |

@@ -66,7 +66,7 @@ Edge cases are never out of scope: see [conventions.md](conventions.md).
 - [x] 04 API
 - [x] 05 Async packet
 - [x] 06 Frontend
-- [ ] 07 3D preview
+- [x] 07 3D preview
 
 ### Phase 2: Backend
 
