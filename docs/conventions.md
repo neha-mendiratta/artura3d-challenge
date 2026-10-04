@@ -44,6 +44,12 @@ Each file in `docs/specs/` uses these sections:
 - Status codes: 400 invalid input, 404 not found, 409 conflicts with current state, 500 unexpected.
 - Money is stored and calculated in integer cents; shown as 2-decimal values.
 
+## Logging
+
+- pino, one shared logger in `apps/api`. No `console.log`.
+- `pino-http` logs every request.
+- Log unexpected errors (500s) and packet failures with `logger.error`, including the relevant id.
+
 ## Git
 
 - Nothing is committed unless the developer explicitly asks.
