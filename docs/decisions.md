@@ -32,4 +32,4 @@ Short log. Newest at the bottom.
 | 26 | Measurement labels as the extra 3D feature | Lets the user check the model against the prescription at a glance; small and clearly useful | Preset camera views, left/right foot mirroring |
 | 27 | `@react-three/test-renderer` for 3D tests | Renders the scene in Jest without a browser or graphics card, so size, colour and cleanup can be tested | Manual testing only |
 | 28 | Supertest for API tests | Standard way to test Express endpoints: sends real HTTP requests to the app without opening a port | Calling route handlers directly |
-| 29 | tsx to run the API in development | Runs TypeScript directly with reload on save; no build step while developing | ts-node, nodemon + tsc |
+| 29 | tsx to run the API (development and the Docker image) | Runs TypeScript directly, including the shared package's TypeScript source; no build step to configure | ts-node; compiling to JavaScript first (see recommendations) |

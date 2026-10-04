@@ -9,7 +9,18 @@ import { quoteRoutes } from './routes/quote-routes';
 
 export const app = express();
 
-app.use(pinoHttp({ logger }));
+app.disable('x-powered-by');
+
+// One short line per request: method, URL, status and response time (no headers).
+app.use(
+  pinoHttp({
+    logger,
+    serializers: {
+      req: (req) => ({ method: req.method, url: req.url }),
+      res: (res) => ({ statusCode: res.statusCode }),
+    },
+  }),
+);
 app.use(express.json());
 
 app.use('/orders', orderRoutes, quoteRoutes, packetRoutes);

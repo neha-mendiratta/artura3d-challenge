@@ -33,5 +33,19 @@ services:
       timeout: 3s
       retries: 15
 
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    environment:
+      DATABASE_URL: postgresql://artura:artura@db:5432/artura
+    ports:
+      - "3000:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+    # Passes stop signals to the API so it shuts down straight away.
+    init: true
+
 volumes:
   db-data:
