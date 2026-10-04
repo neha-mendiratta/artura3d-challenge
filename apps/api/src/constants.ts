@@ -5,3 +5,5 @@ export const WIDTH_RATE_CENTS_PER_MM = 50;
 export const EXPEDITE_PERCENT = 115;
 
 export const ORDERS_PAGE_SIZE = 20;
+
+export const PACKET_POLL_INTERVAL_MS = 1000;

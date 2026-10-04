@@ -74,7 +74,7 @@ Edge cases are never out of scope: see [conventions.md](conventions.md).
 - [x] Pricing
 - [x] Order workflow
 - [x] API endpoints
-- [ ] Async packet worker
+- [x] Async packet worker
 - [ ] API Dockerfile + `api` service in Docker Compose
 
 ### Phase 3: Frontend

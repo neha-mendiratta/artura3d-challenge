@@ -1,15 +1,13 @@
 import { NotFoundError } from '../../src/errors';
 import { getPacket } from '../../src/services/packet-service';
-import { createQuote } from '../../src/services/quote-service';
-import { insertSubmittedOrder, resetDatabase } from '../helpers/db';
+import { insertQuotedOrder, insertSubmittedOrder, resetDatabase } from '../helpers/db';
 import { missingId } from '../helpers/fixtures';
 
 beforeEach(resetDatabase);
 
 describe('getPacket', () => {
   test('returns the packet of a quoted order', async () => {
-    const order = await insertSubmittedOrder();
-    await createQuote(order.id);
+    const order = await insertQuotedOrder();
     const packet = await getPacket(order.id);
     expect(packet).toMatchObject({ orderId: order.id, status: 'Pending' });
   });

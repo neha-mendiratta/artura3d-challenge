@@ -1,6 +1,6 @@
 # Async packet
 
-Status: Approved
+Status: Implemented
 
 ## Source
 
@@ -43,7 +43,7 @@ sequenceDiagram
 
 ### Worker
 
-Runs inside the API process and checks for `Pending` packets every second. All logic is in one function, `processNextPacket()`, so tests can call it directly.
+Runs inside the API process (`src/workers/packet-worker.ts`). Every second it processes all `Pending` packets, one at a time, then waits again, so a burst of quotes is cleared in one go. Each packet is handled by `processNextPacket()`, which tests call directly. The payload is built by `buildPacketPayload()` (`src/services/packet-payload.ts`).
 
 `processNextPacket()`, in one transaction:
 
@@ -100,6 +100,8 @@ If step 2 or 3 throws: roll back, set status `Failed` with the error message, an
 |---|---|---|
 | A `Pending` packet exists | `Completed`, payload saved, `error` null | `completes a pending packet` |
 | Payload content | Matches the order and quote | `builds the payload from the order and quote` |
+| Order without a quote (cannot happen through the API) | Payload builder throws, so the packet is marked `Failed` | `throws when the order has no quote` |
+| Worker started | Pending packets are completed in the background | `processes packets in the background` |
 | No `Pending` packets | Nothing changes | `does nothing when no packet is pending` |
 | Processing throws (simulated) | `Failed`, error message saved, payload null, logged | `marks the packet failed on error` |
 | Two workers run at the same time, one `Pending` packet | Processed once | `processes a packet only once with two workers` |

@@ -13,7 +13,7 @@
 
 - Node, Express and TypeScript.
 - Single responsibility: each file does one job (e.g. config, database connection, logger, one feature's queries, one feature's routes). No file holds everything.
-- API folders by layer: `routes/` (HTTP only), `services/` (business rules), `middleware/` (validation, error handling), `models/` (Sequelize models).
+- API folders by layer: `routes/` (HTTP only), `services/` (business rules), `middleware/` (validation, error handling), `models/` (Sequelize models), `workers/` (background jobs).
 - Reuse, don't repeat: shared helpers live in one place and are imported, never copied into each file.
 - Written to scale: no work per request that grows with table size, no in-memory state that breaks with several API instances.
 

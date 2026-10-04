@@ -1,10 +1,10 @@
 # Handoff
 
-Last updated: 2026-10-04
+Last updated: 2026-10-05
 
 ## Status
 
-Phase 0 (Setup) and Phase 1 (Specs) complete. Phase 2 (Backend) in progress: data model, pricing, order workflow and API endpoints done.
+Phase 0 (Setup) and Phase 1 (Specs) complete. Phase 2 (Backend) in progress: data model, pricing, order workflow, API endpoints and packet worker done. Remaining: API Dockerfile.
 
 ## How to run
 
@@ -36,7 +36,8 @@ pgAdmin: host `localhost`, port `5432`, database `artura`, user `artura`, passwo
 - Spec 07 (3D preview) approved: box model sized and coloured from the form, orbit controls, WebGL cleanup, measurement labels
 - Data model implemented: Sequelize migration (`apps/api/migrations`), models (`apps/api/src/models`), `config.ts`, `logger.ts`, `db.ts`; 11 tests pass against the test database
 - Pricing implemented: `apps/api/src/pricing.ts`, 4 unit tests
-- API endpoints implemented: orders list (cursor pages, status filter), idempotent quote (`services/quote-service.ts`), packet (`services/packet-service.ts`); 69 tests in total
+- Packet worker implemented: `workers/packet-worker.ts` (claims with FOR UPDATE SKIP LOCKED, drains all Pending packets every second), `services/packet-payload.ts`; started by `server.ts`; 77 tests in total
+- API endpoints implemented: orders list (cursor pages, status filter), idempotent quote (`services/quote-service.ts`), packet (`services/packet-service.ts`)
 - Order workflow implemented: Express app (`app.ts`, `server.ts`), `errors.ts`, `middleware/` (validate, error handler), `routes/order-routes.ts`, `services/order-service.ts`, shared Zod schema in `packages/shared`; create, get, edit, notes, submit
 - `docs/recommendations.md`: improvements beyond the brief, for the interview
 - `docs/plan.md`, `docs/conventions.md`, `docs/decisions.md`, spec templates `docs/specs/01–07`
@@ -51,7 +52,7 @@ Nothing.
 
 ## Next step
 
-Phase 2: async packet worker (spec 05).
+Phase 2: API Dockerfile and `api` service in Docker Compose.
 
 ## Notes for later steps
 
