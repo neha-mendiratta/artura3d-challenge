@@ -28,6 +28,7 @@ pgAdmin: host `localhost`, port `5432`, database `artura`, user `artura`, passwo
 - Spec 01 (data model) approved: 3 tables (`orders`, `quotes`, `manufacturing_packets`), plain SQL with `pg`, UUID v7 ids from PostgreSQL 18, cursor pagination, index budget
 - Spec 02 (pricing) approved: one function in `apps/api`, calculated in cents, rounded half up
 - Spec 03 (order workflow) approved: Draft → Submitted, only notes editable after submit, quotes only for Submitted orders
+- Spec 04 (API) approved: 6 brief endpoints + `GET /orders` and `PATCH /orders/{id}/notes`, one error format, idempotent quote
 - `docs/recommendations.md`: improvements beyond the brief, for the interview
 - `docs/plan.md`, `docs/conventions.md`, `docs/decisions.md`, spec templates `docs/specs/01–07`
 - Docker Compose: `db` (dev, persistent volume) and `db-test` (in-memory, tests only), Postgres 18
@@ -41,12 +42,10 @@ Nothing.
 
 ## Next step
 
-Write spec 04 (API), then developer review.
+Write spec 05 (async packet), then developer review.
 
 ## Open questions
 
-- `patientRef` search (exact or prefix) and its index: decide in spec 04.
-- Notes edit after submit: `PATCH /orders/{id}/notes` or `PUT` accepting only `notes` when Submitted (decide in spec 04).
 - Hosted deployment: deferred to the end (decision 3).
 
 ## Known issues

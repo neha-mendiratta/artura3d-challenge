@@ -95,7 +95,6 @@ The app is for high-volume order processing, so the design must stay fast as tab
 | Orders list: `OFFSET` pagination gets slower the deeper you page, because the database still reads every skipped row | **Cursor (keyset) pagination** on `id`: each page starts where the last ended, so page 1 and page 10,000 cost the same. UUID v7 is time-ordered, so sorting by `id` is creation order. Details in spec 04 |
 | Orders list newest first, no filter | Served by the primary key index. No extra index |
 | Orders list filtered by status | Index on `orders(status, id)` |
-| Finding an order by patient reference | Index on `orders(patient_ref)` **only if** spec 04 includes search, matching its search behaviour. No search, no index |
 | `COUNT(*)` for "page X of Y" scans the whole table | No total count. The list returns a `nextCursor`; the UI shows "Load more" |
 | Worker polls for `Pending` packets while `Completed` ones pile up | Index on `manufacturing_packets(status, id)`: the worker jumps straight to the few `Pending` rows, oldest first, however many completed rows exist |
 | Several workers polling at once | Each worker claims packets with `FOR UPDATE SKIP LOCKED`, so no packet is processed twice and workers don't block each other (spec 05) |
@@ -107,7 +106,7 @@ The app is for high-volume order processing, so the design must stay fast as tab
 
 | Table | Indexes |
 |---|---|
-| `orders` | Primary key; `(status, id)`; `patient_ref` only if search is in spec 04 |
+| `orders` | Primary key; `(status, id)` |
 | `quotes` | Primary key; unique `order_id` (enforces one quote per order) |
 | `manufacturing_packets` | Primary key; unique `order_id` (enforces one packet per order); `(status, id)` |
 
