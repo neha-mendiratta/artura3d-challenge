@@ -26,6 +26,7 @@ pgAdmin: host `localhost`, port `5432`, database `artura`, user `artura`, passwo
 ## Done
 
 - Spec 01 (data model) approved: 3 tables (`orders`, `quotes`, `manufacturing_packets`), plain SQL with `pg`, UUID v7 ids from PostgreSQL 18, cursor pagination, index budget
+- Spec 02 (pricing) approved: one function in `apps/api`, calculated in cents, rounded half up
 - `docs/recommendations.md`: improvements beyond the brief, for the interview
 - `docs/plan.md`, `docs/conventions.md`, `docs/decisions.md`, spec templates `docs/specs/01–07`
 - Docker Compose: `db` (dev, persistent volume) and `db-test` (in-memory, tests only), Postgres 18
@@ -39,7 +40,7 @@ Nothing.
 
 ## Next step
 
-Write spec 02 (pricing), then developer review.
+Write spec 03 (order workflow), then developer review.
 
 ## Open questions
 
