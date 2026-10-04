@@ -119,6 +119,10 @@ The unique `order_id` makes this safe when two requests arrive at the same time:
 | Situation | Expected | Test |
 |---|---|---|
 | Create a valid order | 201, status `Draft` | `creates an order` |
+| Get an order | 200, the order with `quote: null` until quoted | `returns an order by id` |
+| Edit a Draft order | 200, updated order | `updates an order` |
+| Submit an order | 200, status `Submitted` | `submits an order` |
+| Submit twice | 409 `CONFLICT` | `returns 409 when submitting twice` |
 | Missing required field | 400 `VALIDATION_ERROR` | `rejects a missing field` |
 | Dimension out of range or with 2 decimals | 400 | `rejects an invalid dimension` |
 | Colour not `#RRGGBB` | 400 | `rejects an invalid colour` |

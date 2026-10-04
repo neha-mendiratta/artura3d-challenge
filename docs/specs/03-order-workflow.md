@@ -39,7 +39,7 @@ If no row is updated, the order either does not exist (404) or is not `Draft` (4
 |---|---|---|
 | Submit a Draft order | 200, status `Submitted`, `submitted_at` set | `submits a draft order` |
 | Submit a Submitted order | 409, order unchanged | `rejects submitting twice` |
-| Submit an order that does not exist | 404 | `returns 404 when submitting a missing order` |
+| Submit an order that does not exist | 404 | `rejects submitting a missing order` |
 | Two submits at the same time | One 200, one 409 | `allows only one of two concurrent submits` |
 | Edit a Draft order | 200, changes saved | `edits a draft order` |
 | Edit a Submitted order (any field except notes) | 409, order unchanged | `rejects editing a submitted order` |
@@ -49,7 +49,7 @@ If no row is updated, the order either does not exist (404) or is not `Draft` (4
 ## Acceptance criteria
 
 1. Orders follow the rules above.
-2. Every edge case above has a passing integration test.
+2. Every edge case above has a passing integration test (`tests/services/order-service.test.ts`).
 
 ## Out of scope
 

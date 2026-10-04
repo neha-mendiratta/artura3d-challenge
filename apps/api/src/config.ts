@@ -9,4 +9,5 @@ function required(name: string): string {
 export const config = {
   databaseUrl: required('DATABASE_URL'),
   logLevel: process.env.LOG_LEVEL ?? 'info',
+  port: Number(process.env.PORT ?? 3000),
 };

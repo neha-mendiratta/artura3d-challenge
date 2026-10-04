@@ -4,11 +4,15 @@
   "version": "0.0.0",
   "scripts": {
     "test": "npm test --prefix ../.. -- apps/api",
-    "migrate": "node --env-file=../../.env ../../node_modules/sequelize-cli/lib/sequelize db:migrate"
+    "migrate": "node --env-file=../../.env ../../node_modules/sequelize-cli/lib/sequelize db:migrate",
+    "dev": "tsx watch --env-file=../../.env src/server.ts"
   },
   "dependencies": {
+    "@artura/shared": "^0.0.0",
+    "express": "^5.2.1",
     "pg": "^8.23.1",
     "pino": "^10.4.0",
+    "pino-http": "^11.0.0",
     "sequelize": "^6.37.8",
     "sequelize-cli": "^6.6.5"
   }

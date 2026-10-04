@@ -1,5 +1,6 @@
 import { CreationOptional, DataTypes, InferAttributes, InferCreationAttributes, Model } from 'sequelize';
 import { sequelize } from '../db';
+import { Order } from './order';
 import { idColumn } from './shared-columns';
 
 export class Quote extends Model<InferAttributes<Quote>, InferCreationAttributes<Quote>> {
@@ -18,3 +19,5 @@ Quote.init(
   },
   { sequelize, tableName: 'quotes', underscored: true, updatedAt: false },
 );
+
+Order.hasOne(Quote, { foreignKey: 'orderId', as: 'quote' });

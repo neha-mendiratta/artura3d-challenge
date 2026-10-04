@@ -13,6 +13,7 @@
 
 - Node, Express and TypeScript.
 - Single responsibility: each file does one job (e.g. config, database connection, logger, one feature's queries, one feature's routes). No file holds everything.
+- API folders by layer: `routes/` (HTTP only), `services/` (business rules), `middleware/` (validation, error handling), `models/` (Sequelize models).
 - Reuse, don't repeat: shared helpers live in one place and are imported, never copied into each file.
 - Written to scale: no work per request that grows with table size, no in-memory state that breaks with several API instances.
 
@@ -39,10 +40,11 @@ Each file in `docs/specs/` uses these sections:
 
 - Jest. Test names describe behaviour, e.g. `returns 409 when submitting a Submitted order`.
 - Unit tests for pure logic (pricing, transitions). Integration tests for endpoints against the test database.
-- Tests never use the dev database.
+- Tests never use the dev database. Test files run one at a time (`maxWorkers: 1`) because they share the test database.
 - One Jest config at the root (`jest.config.js`).
 - One `tsconfig.json` at the root for the backend packages. `npm test` type-checks (`tsc --noEmit`), then runs all tests. Jest alone does not type-check (ts-jest is transpile-only because `isolatedModules` is on).
 - Quick run while iterating: `npx jest <path>` (no type check).
+- Tests mirror the source folders: `src/routes/order-routes.ts` → `tests/routes/order-routes.test.ts`. Shared test code lives in `tests/helpers/` and `tests/setup/`.
 - A step is done only when `npm test` passes.
 
 ## API

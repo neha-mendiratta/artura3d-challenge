@@ -2,6 +2,8 @@ const transform = { '^.+\\.ts$': 'ts-jest' };
 
 /** @type {import('jest').Config} */
 module.exports = {
+  // API test files share one test database and reset it between tests, so they must not run in parallel.
+  maxWorkers: 1,
   projects: [
     {
       displayName: 'api',

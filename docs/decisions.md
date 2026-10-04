@@ -31,3 +31,5 @@ Short log. Newest at the bottom.
 | 25 | Mantine form for the order form | Part of the UI library already chosen; works with the shared Zod schema | react-hook-form |
 | 26 | Measurement labels as the extra 3D feature | Lets the user check the model against the prescription at a glance; small and clearly useful | Preset camera views, left/right foot mirroring |
 | 27 | `@react-three/test-renderer` for 3D tests | Renders the scene in Jest without a browser or graphics card, so size, colour and cleanup can be tested | Manual testing only |
+| 28 | Supertest for API tests | Standard way to test Express endpoints: sends real HTTP requests to the app without opening a port | Calling route handlers directly |
+| 29 | tsx to run the API in development | Runs TypeScript directly with reload on save; no build step while developing | ts-node, nodemon + tsc |

@@ -1,6 +1,14 @@
-import { CreationOptional, DataTypes, InferAttributes, InferCreationAttributes, Model } from 'sequelize';
+import {
+  CreationOptional,
+  DataTypes,
+  InferAttributes,
+  InferCreationAttributes,
+  Model,
+  NonAttribute,
+} from 'sequelize';
 import { sequelize } from '../db';
 import { OrderStatus } from '../types';
+import type { Quote } from './quote';
 import { decimalColumn, idColumn } from './shared-columns';
 
 export class Order extends Model<InferAttributes<Order>, InferCreationAttributes<Order>> {
@@ -16,6 +24,7 @@ export class Order extends Model<InferAttributes<Order>, InferCreationAttributes
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
   declare submittedAt: CreationOptional<Date | null>;
+  declare quote?: NonAttribute<Quote | null>;
 }
 
 // status and expedite defaults live in the database; Sequelize sets createdAt and updatedAt.

@@ -1,10 +1,10 @@
 import { ForeignKeyConstraintError, QueryTypes, UniqueConstraintError } from 'sequelize';
-import { sequelize } from '../src/db';
-import { ManufacturingPacket } from '../src/models/manufacturing-packet';
-import { Order } from '../src/models/order';
-import { Quote } from '../src/models/quote';
-import { insertOrder, resetDatabase } from './helpers/db';
-import { runMigrations } from './helpers/migrate';
+import { sequelize } from '../../src/db';
+import { ManufacturingPacket } from '../../src/models/manufacturing-packet';
+import { Order } from '../../src/models/order';
+import { Quote } from '../../src/models/quote';
+import { insertOrder, resetDatabase } from '../helpers/db';
+import { runMigrations } from '../helpers/migrate';
 
 const missingOrderId = '01a104ee-0000-7000-8000-000000000000';
 
