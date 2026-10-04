@@ -1,0 +1,23 @@
+{
+  "name": "artura3d-challenge",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "db:up": "docker compose up -d --wait",
+    "db:down": "docker compose down",
+    "test": "tsc --noEmit && jest"
+  },
+  "devDependencies": {
+    "@types/jest": "30.0.0",
+    "@types/node": "22.20.5",
+    "jest": "30.5.2",
+    "ts-jest": "29.4.14",
+    "typescript": "6.0.3"
+  }
+}
