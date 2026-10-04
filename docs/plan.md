@@ -12,7 +12,7 @@ A small full-stack app for creating and processing custom orthotic manufacturing
 |---|---|
 | Backend | Node 22 + TypeScript 6, Express 5, `pg` (plain SQL), `node-pg-migrate`, pino |
 | Database | PostgreSQL 18 in Docker (dev + separate test database) |
-| Frontend | React + TypeScript, Vite, Mantine, TanStack Query, react-three-fiber |
+| Frontend | React + TypeScript, Vite, Mantine, TanStack Query, React Router, react-three-fiber |
 | Shared | TypeScript package: Zod schemas, status types |
 | Tests | Jest (backend and frontend) |
 | Repo | npm workspaces |
@@ -65,7 +65,7 @@ Edge cases are never out of scope: see [conventions.md](conventions.md).
 - [x] 03 Order workflow
 - [x] 04 API
 - [x] 05 Async packet
-- [ ] 06 Frontend
+- [x] 06 Frontend
 - [ ] 07 3D preview
 
 ### Phase 2: Backend
