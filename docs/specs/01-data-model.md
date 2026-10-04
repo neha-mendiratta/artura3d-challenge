@@ -1,16 +1,159 @@
 # Data model
 
-Status: Not started
+Status: Approved
 
 ## Source
 
+- Pricing uses `ThicknessMm`, `WidthMm`, `Expedite`.
+- Orders start as `Draft`; `Submitted` orders are immutable except an optional `Notes` field.
+- A quote is created once per order (`POST /orders/{id}/quote` is idempotent).
+- The first quote creates a `ManufacturingPacket` with status `Pending`, processed asynchronously into a persisted JSON payload, then marked `Completed` or `Failed`.
+- 3D preview: dimension controls and colour selection.
+
 ## Behaviour
+
+Three tables, created by plain SQL migration files in `apps/api/migrations/` (run with `node-pg-migrate`). Queries use the `pg` driver.
+
+**Naming:** tables and columns use Postgres convention (`snake_case`, plural table names), because `order` is a reserved word in SQL. TypeScript uses `camelCase`; each table's row is converted in one place. Status values use the brief's names exactly.
+
+### `orders`
+
+| Column | Type | Rules |
+|---|---|---|
+| `id` | uuid | Primary key. Default `uuidv7()` (see Volume and performance) |
+| `patient_ref` | text | Required. 1–50 characters after trimming. Identifies the order for an ops user |
+| `length_mm` | numeric(4,1) | Required. 150.0–350.0, max 1 decimal place |
+| `width_mm` | numeric(4,1) | Required. 50.0–150.0, max 1 decimal place |
+| `thickness_mm` | numeric(3,1) | Required. 1.0–15.0, max 1 decimal place |
+| `colour` | text | Required. Hex `#RRGGBB`, stored uppercase |
+| `expedite` | boolean | Required. Default `false` |
+| `notes` | text, nullable | Max 1000 characters. Empty or whitespace-only is stored as `null` |
+| `status` | enum `order_status` | `Draft` \| `Submitted`. Default `Draft` |
+| `created_at` | timestamptz | Default `now()` |
+| `updated_at` | timestamptz | Default `now()`. Every `UPDATE` statement sets `updated_at = now()` |
+| `submitted_at` | timestamptz, nullable | Set once, when submitted |
+
+`length_mm` is not used in pricing; it drives the 3D model and goes into the manufacturing payload.
+
+The `pg` driver returns `numeric` values as strings (to avoid losing precision on very large numbers). Dimensions have at most 4 digits, so they are converted to JavaScript numbers once, when the database connection is set up.
+
+### `quotes`
+
+| Column | Type | Rules |
+|---|---|---|
+| `id` | uuid | Primary key. Default `uuidv7()` |
+| `order_id` | uuid | Foreign key to `orders`. **Unique**: at most one quote per order |
+| `total_cents` | integer | Price in cents, calculated by the pricing rules (spec 02) |
+| `created_at` | timestamptz | Default `now()` |
+
+Only the total is stored. The inputs (thickness, width, expedite) live on the order, which is immutable once submitted, so the breakdown can always be recalculated for display. Storing the total keeps an issued quote unchanged even if pricing rules change later.
+
+### `manufacturing_packets`
+
+| Column | Type | Rules |
+|---|---|---|
+| `id` | uuid | Primary key. Default `uuidv7()` |
+| `order_id` | uuid | Foreign key to `orders`. **Unique**: at most one packet per order |
+| `status` | enum `packet_status` | `Pending` \| `Completed` \| `Failed`. Default `Pending` |
+| `payload` | jsonb, nullable | Set only when `Completed` |
+| `attempts` | integer | Default `0`. Incremented on each processing attempt |
+| `error` | text, nullable | Last failure reason. Set only when `Failed` |
+| `created_at` | timestamptz | Default `now()` |
+| `updated_at` | timestamptz | Default `now()`. Every `UPDATE` statement sets `updated_at = now()` |
+
+The packet links to the order (not the quote) because the API reads it by order (`GET /orders/{id}/packet`), and each order has at most one quote.
+
+### Status changes
+
+- `orders.status`: `Draft` on create → `Submitted` on submit. Changes once, never back. Quote and packet never change it. Rules: spec 03.
+- `manufacturing_packets.status`: `Pending` on create → `Completed` or `Failed`. Rules: spec 05.
+- A combined order "stage" is a recommendation, not built: see [recommendations.md](../recommendations.md).
+
+### Relationships
+
+```
+orders 1 ── 0..1 quotes
+orders 1 ── 0..1 manufacturing_packets
+```
+
+No deletes exist in the app, so no cascade rules are needed.
+
+### Where rules are enforced
+
+- **Database:** types, required fields, defaults, foreign keys, unique `order_id` on `quotes` and `manufacturing_packets`, numeric precision.
+- **API (shared Zod schemas, spec 04):** ranges, decimal places, hex format, trimming, length limits.
+
+The unique constraints are the last line of defence for idempotency when two requests race (spec 04, spec 05).
+
+### Volume and performance
+
+The app is for high-volume order processing, so the design must stay fast as tables grow to millions of rows.
+
+| Concern at high volume | Design decision |
+|---|---|
+| Random UUID v4 keys scatter inserts across the index, which slows inserts and bloats the index on large tables | **UUID v7** ids: time-ordered, so new rows append to the end of the index. Still unguessable in URLs. Generated by the database (`uuidv7()`, built into PostgreSQL 18) |
+| Orders list: `OFFSET` pagination gets slower the deeper you page, because the database still reads every skipped row | **Cursor (keyset) pagination** on `id`: each page starts where the last ended, so page 1 and page 10,000 cost the same. UUID v7 is time-ordered, so sorting by `id` is creation order. Details in spec 04 |
+| Orders list newest first, no filter | Served by the primary key index. No extra index |
+| Orders list filtered by status | Index on `orders(status, id)` |
+| Finding an order by patient reference | Index on `orders(patient_ref)` **only if** spec 04 includes search, matching its search behaviour. No search, no index |
+| `COUNT(*)` for "page X of Y" scans the whole table | No total count. The list returns a `nextCursor`; the UI shows "Load more" |
+| Worker polls for `Pending` packets while `Completed` ones pile up | Index on `manufacturing_packets(status, id)`: the worker jumps straight to the few `Pending` rows, oldest first, however many completed rows exist |
+| Several workers polling at once | Each worker claims packets with `FOR UPDATE SKIP LOCKED`, so no packet is processed twice and workers don't block each other (spec 05) |
+| Many requests quoting or submitting the same order | Single-statement conditional updates (`UPDATE ... WHERE status = 'Draft'`) and unique constraints (`INSERT ... ON CONFLICT DO NOTHING`), not "read then write" checks in code (specs 03, 04) |
+| Reading a quote or packet by order | The unique constraints on `order_id` already create these indexes |
+| Packet `payload` (jsonb) makes rows wide | List queries select only the columns they show; the payload is read only by `GET /orders/{id}/packet` |
+
+**Index budget.** Every index adds a small cost to each insert, and to each update that changes an indexed column. The workload is read-heavy (an order is written a few times, read many times), and each index here serves a query the app actually runs:
+
+| Table | Indexes |
+|---|---|
+| `orders` | Primary key; `(status, id)`; `patient_ref` only if search is in spec 04 |
+| `quotes` | Primary key; unique `order_id` (enforces one quote per order) |
+| `manufacturing_packets` | Primary key; unique `order_id` (enforces one packet per order); `(status, id)` |
+
+Draft edits change only non-indexed columns, so Postgres can apply them without touching any index (HOT update). Submit and packet status changes touch one index each, once per order.
+
+No `created_at` index: UUID v7 starts with the creation timestamp, so `ORDER BY id` is creation order and the primary key index serves the list. If ids ever change to random UUID v4, an index on `(created_at, id)` is needed instead.
+
+Ids are generated by the database, so all of them come from one clock and their order matches creation order.
+
+Beyond this (partitioning, archiving, read replicas, connection pooling) is listed in [recommendations.md](../recommendations.md).
 
 ## Edge cases
 
 | Situation | Expected behaviour | Test |
 |---|---|---|
+| Order inserted without `status`, `expedite` | `status = Draft`, `expedite = false` | `creates an order with default status Draft and expedite false` |
+| Second quote inserted for the same order | Database rejects it (unique violation) | `rejects a second quote for the same order` |
+| Second packet inserted for the same order | Database rejects it (unique violation) | `rejects a second packet for the same order` |
+| Quote or packet for a non-existent order | Database rejects it (foreign key violation) | `rejects a quote for a non-existent order` |
+| Packet inserted without `status`, `attempts` | `status = Pending`, `attempts = 0`, `payload = null`, `error = null` | `creates a packet with status Pending and zero attempts` |
+| Dimension with 1 decimal place (e.g. `3.5`) | Stored as `3.5` and returned as the number `3.5` (not the string `"3.5"`) | `stores and returns 1-decimal dimensions as numbers` |
+| Dimension with more than 1 decimal place inserted directly (e.g. `3.55`) | Database rounds to `numeric(3,1)` precision. The API never sends this: it rejects it first (spec 04) | `rounds dimensions to 1 decimal place at the database` |
+| Order updated | `updated_at` changes, `created_at` does not | `updates updated_at but not created_at on update` |
+| Orders created one after another | Each new `id` sorts after the previous one (UUID v7 is time-ordered) | `generates time-ordered ids` |
+| Migrations applied to an empty database | Tables, enums and exactly the indexes in the index budget exist, no others | `creates exactly the expected indexes` |
+| Migrations run twice | Second run does nothing (already-applied migrations are skipped) | `does not re-apply migrations` |
 
 ## Acceptance criteria
 
+1. SQL migrations create the `orders`, `quotes` and `manufacturing_packets` tables and the `order_status` and `packet_status` enums as described.
+2. Defaults apply as described (ids, timestamps, order status, expedite, packet status, attempts).
+3. A second quote or packet for the same order is rejected by the database.
+4. A quote or packet cannot reference a non-existent order.
+5. Dimensions are returned as numbers and 1-decimal values round-trip exactly.
+6. Ids are UUID v7 generated by the database; exactly the indexes in the index budget exist.
+7. Every edge case above has a passing integration test against the test database.
+
 ## Out of scope
+
+- Users, authentication, audit history
+- Deleting orders
+- Left/right foot, materials, other orthotic attributes
+- Storing the price breakdown on the quote
+
+## Resolved questions
+
+1. `patientRef`: keep.
+2. Dimension ranges (length 150–350, width 50–150, thickness 1–15 mm, max 1 decimal place): accepted.
+3. `numeric` for dimensions, converted to plain numbers in API responses: accepted.

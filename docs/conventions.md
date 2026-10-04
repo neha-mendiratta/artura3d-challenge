@@ -3,6 +3,7 @@
 ## Simplicity
 
 - Build only what the brief and approved specs ask for. Anything else is listed under "Out of scope" in the spec, not built.
+- Improvement ideas beyond the brief go in [recommendations.md](recommendations.md) for discussion, not into the code.
 - Plain functions and small files. No abstraction "just in case" (e.g. no repository classes wrapping simple SQL queries).
 - One place per rule: pricing in one function, status transitions in one function.
 - Clear names over clever code. Comments only explain *why*, never *what*.

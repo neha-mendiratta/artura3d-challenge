@@ -60,7 +60,7 @@ Edge cases are never out of scope: see [conventions.md](conventions.md).
 
 ### Phase 1: Specs (review before any feature code)
 
-- [ ] 01 Data model
+- [x] 01 Data model
 - [ ] 02 Pricing
 - [ ] 03 Order workflow
 - [ ] 04 API

@@ -4,7 +4,7 @@ Last updated: 2026-10-04
 
 ## Status
 
-Phase 0 (Setup) complete. No application code yet. Next: Phase 1, specs.
+Phase 0 (Setup) complete. Phase 1 (Specs) in progress. No application code yet.
 
 ## How to run
 
@@ -25,6 +25,8 @@ pgAdmin: host `localhost`, port `5432`, database `artura`, user `artura`, passwo
 
 ## Done
 
+- Spec 01 (data model) approved: 3 tables (`orders`, `quotes`, `manufacturing_packets`), plain SQL with `pg`, UUID v7 ids from PostgreSQL 18, cursor pagination, index budget
+- `docs/recommendations.md`: improvements beyond the brief, for the interview
 - `docs/plan.md`, `docs/conventions.md`, `docs/decisions.md`, spec templates `docs/specs/01–07`
 - Docker Compose: `db` (dev, persistent volume) and `db-test` (in-memory, tests only), Postgres 18
 - npm workspaces: `apps/api`, `packages/shared`
@@ -37,10 +39,11 @@ Nothing.
 
 ## Next step
 
-Phase 1: write spec 01 (data model), then developer review.
+Write spec 02 (pricing), then developer review.
 
 ## Open questions
 
+- `patientRef` search (exact or prefix) and its index: decide in spec 04.
 - Notes edit after submit: `PATCH /orders/{id}/notes` or `PUT` accepting only `notes` when Submitted (decide in spec 04).
 - Hosted deployment: deferred to the end (decision 3).
 
