@@ -1,8 +1,7 @@
 import { CreationOptional, DataTypes, InferAttributes, InferCreationAttributes, Model } from 'sequelize';
 import { sequelize } from '../db';
+import { OrderStatus } from '../types';
 import { decimalColumn, idColumn } from './shared-columns';
-
-export type OrderStatus = 'Draft' | 'Submitted';
 
 export class Order extends Model<InferAttributes<Order>, InferCreationAttributes<Order>> {
   declare id: CreationOptional<string>;

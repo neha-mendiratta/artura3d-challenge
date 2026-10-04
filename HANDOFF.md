@@ -4,7 +4,7 @@ Last updated: 2026-10-04
 
 ## Status
 
-Phase 0 (Setup) and Phase 1 (Specs) complete. Phase 2 (Backend) in progress: data model done.
+Phase 0 (Setup) and Phase 1 (Specs) complete. Phase 2 (Backend) in progress: data model and pricing done.
 
 ## How to run
 
@@ -34,6 +34,7 @@ pgAdmin: host `localhost`, port `5432`, database `artura`, user `artura`, passwo
 - Spec 06 (frontend) approved: orders list, new order and order pages; shared Zod validation; packet status polling
 - Spec 07 (3D preview) approved: box model sized and coloured from the form, orbit controls, WebGL cleanup, measurement labels
 - Data model implemented: Sequelize migration (`apps/api/migrations`), models (`apps/api/src/models`), `config.ts`, `logger.ts`, `db.ts`; 11 tests pass against the test database
+- Pricing implemented: `apps/api/src/pricing.ts`, 4 unit tests
 - `docs/recommendations.md`: improvements beyond the brief, for the interview
 - `docs/plan.md`, `docs/conventions.md`, `docs/decisions.md`, spec templates `docs/specs/01–07`
 - Docker Compose: `db` (dev, persistent volume) and `db-test` (in-memory, tests only), Postgres 18
@@ -47,11 +48,11 @@ Nothing.
 
 ## Next step
 
-Phase 2: pricing (spec 02).
+Phase 2: order workflow (spec 03).
 
 ## Notes for later steps
 
-- `OrderStatus` and `PacketStatus` live in their model files for now. Move them to `packages/shared/src/types.ts` when the frontend needs them (Phase 3).
+- `OrderStatus` and `PacketStatus` are in `apps/api/src/types.ts`. Move them to `packages/shared` when the frontend needs them (Phase 3).
 
 ## Open questions
 

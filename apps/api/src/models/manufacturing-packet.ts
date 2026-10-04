@@ -1,8 +1,7 @@
 import { CreationOptional, DataTypes, InferAttributes, InferCreationAttributes, Model } from 'sequelize';
 import { sequelize } from '../db';
+import { PacketStatus } from '../types';
 import { idColumn } from './shared-columns';
-
-export type PacketStatus = 'Pending' | 'Completed' | 'Failed';
 
 export class ManufacturingPacket extends Model<
   InferAttributes<ManufacturingPacket>,

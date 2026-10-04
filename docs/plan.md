@@ -71,7 +71,7 @@ Edge cases are never out of scope: see [conventions.md](conventions.md).
 ### Phase 2: Backend
 
 - [x] Data model: migration and models
-- [ ] Pricing
+- [x] Pricing
 - [ ] Order workflow
 - [ ] API endpoints
 - [ ] Async packet worker

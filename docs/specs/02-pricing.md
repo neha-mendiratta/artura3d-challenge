@@ -1,6 +1,6 @@
 # Pricing
 
-Status: Approved
+Status: Implemented
 
 ## Source
 
@@ -21,8 +21,12 @@ calculatePriceCents({ thicknessMm, widthMm, expedite }): number
 It returns the total in cents, which is what gets stored (`quotes.total_cents`).
 
 ```ts
-const subtotal = 10000 + Math.round(thicknessMm * 200) + Math.round(widthMm * 50);
-return expedite ? Math.round((subtotal * 115) / 100) : subtotal;
+const subtotal =
+  BASE_PRICE_CENTS +                                   // 10_000
+  Math.round(thicknessMm * THICKNESS_RATE_CENTS_PER_MM) + // 200
+  Math.round(widthMm * WIDTH_RATE_CENTS_PER_MM);       // 50
+const total = expedite ? Math.round((subtotal * EXPEDITE_PERCENT) / 100) : subtotal; // 115
+return total;
 ```
 
 - Works in cents (whole numbers) because decimal maths gives wrong results: `127.30 × 1.15` should be `146.395` → `146.40`, but floating point gives `146.39`.
