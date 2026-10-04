@@ -21,13 +21,14 @@ Draft ──submit──> Submitted
 - **After submit:** only `notes` can change.
 - **Quote:** only for `Submitted` orders. A quote is the basis for manufacturing, so the order must be final.
 
-Each change is one SQL statement that checks the status in its `WHERE` clause, so two requests at the same time cannot both succeed:
+Each change is one update that checks the status in its `WHERE` clause, so two requests at the same time cannot both succeed:
 
-```sql
-UPDATE orders
-SET status = 'Submitted', submitted_at = now(), updated_at = now()
-WHERE id = $1 AND status = 'Draft'
-RETURNING *;
+```ts
+Order.update(
+  { status: 'Submitted', submittedAt: new Date() },
+  { where: { id, status: 'Draft' }, returning: true },
+);
+// SQL: UPDATE orders SET status = 'Submitted', ... WHERE id = $1 AND status = 'Draft' RETURNING *
 ```
 
 If no row is updated, the order either does not exist (404) or is not `Draft` (409).

@@ -48,12 +48,15 @@ Runs inside the API process and checks for `Pending` packets every second. All l
 `processNextPacket()`, in one transaction:
 
 1. Claim the oldest `Pending` packet:
-   ```sql
-   SELECT * FROM manufacturing_packets
-   WHERE status = 'Pending'
-   ORDER BY id
-   LIMIT 1
-   FOR UPDATE SKIP LOCKED;
+   ```ts
+   ManufacturingPacket.findOne({
+     where: { status: 'Pending' },
+     order: [['id', 'ASC']],
+     lock: true,
+     skipLocked: true,
+     transaction,
+   });
+   // SQL: SELECT ... WHERE status = 'Pending' ORDER BY id LIMIT 1 FOR UPDATE SKIP LOCKED
    ```
    No packet → do nothing.
 2. Read the order and its quote, build the payload.
@@ -61,7 +64,7 @@ Runs inside the API process and checks for `Pending` packets every second. All l
 
 If step 2 or 3 throws: roll back, set status `Failed` with the error message, and log it with pino.
 
-- `FOR UPDATE` locks the claimed row; `SKIP LOCKED` makes other workers skip it, so a packet is never processed twice, even with several workers.
+- `lock` (`FOR UPDATE`) locks the claimed row; `skipLocked` (`SKIP LOCKED`) makes other workers skip it, so a packet is never processed twice, even with several workers.
 - If the API stops mid-processing, the transaction is rolled back and the packet is still `Pending`, so it is processed after restart.
 
 ### Why no retries

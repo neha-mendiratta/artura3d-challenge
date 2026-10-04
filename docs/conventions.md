@@ -4,10 +4,17 @@
 
 - Build only what the brief and approved specs ask for. Anything else is listed under "Out of scope" in the spec, not built.
 - Improvement ideas beyond the brief go in [recommendations.md](recommendations.md) for discussion, not into the code.
-- Plain functions and small files. No abstraction "just in case" (e.g. no repository classes wrapping simple SQL queries).
+- Plain functions and small files. No abstraction "just in case" (e.g. no repository classes wrapping Sequelize models).
 - One place per rule: pricing in one function, status transitions in one function.
-- Clear names over clever code. Comments only explain *why*, never *what*.
+- Clear names over clever code. Comments only explain *why*, never *what*; keep them few.
 - Few dependencies. Each one is justified in [decisions.md](decisions.md).
+
+## Code structure
+
+- Node, Express and TypeScript.
+- Single responsibility: each file does one job (e.g. config, database connection, logger, one feature's queries, one feature's routes). No file holds everything.
+- Reuse, don't repeat: shared helpers live in one place and are imported, never copied into each file.
+- Written to scale: no work per request that grows with table size, no in-memory state that breaks with several API instances.
 
 ## Simple, not incomplete
 
@@ -49,6 +56,7 @@ Each file in `docs/specs/` uses these sections:
 - pino, one shared logger in `apps/api`. No `console.log`.
 - `pino-http` logs every request.
 - Log unexpected errors (500s) and packet failures with `logger.error`, including the relevant id.
+- Log only where it helps diagnose a problem. No logging in every function.
 
 ## Git
 

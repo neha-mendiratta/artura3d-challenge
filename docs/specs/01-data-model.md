@@ -12,9 +12,9 @@ Status: Approved
 
 ## Behaviour
 
-Three tables, created by plain SQL migration files in `apps/api/migrations/` (run with `node-pg-migrate`). Queries use the `pg` driver.
+Three tables, created by a Sequelize migration in `apps/api/migrations/` (run with `sequelize-cli`). The app uses one Sequelize model per table in `apps/api/src/models/`.
 
-**Naming:** tables and columns use Postgres convention (`snake_case`, plural table names), because `order` is a reserved word in SQL. TypeScript uses `camelCase`; each table's row is converted in one place. Status values use the brief's names exactly.
+**Naming:** tables and columns use Postgres convention (`snake_case`, plural table names), because `order` is a reserved word in SQL. TypeScript uses `camelCase`; Sequelize maps between them (`underscored: true`). Status values use the brief's names exactly.
 
 ### `orders`
 
@@ -28,14 +28,14 @@ Three tables, created by plain SQL migration files in `apps/api/migrations/` (ru
 | `colour` | text | Required. Hex `#RRGGBB`, stored uppercase |
 | `expedite` | boolean | Required. Default `false` |
 | `notes` | text, nullable | Max 1000 characters. Empty or whitespace-only is stored as `null` |
-| `status` | enum `order_status` | `Draft` \| `Submitted`. Default `Draft` |
+| `status` | enum `enum_orders_status` | `Draft` \| `Submitted`. Default `Draft` |
 | `created_at` | timestamptz | Default `now()` |
-| `updated_at` | timestamptz | Default `now()`. Every `UPDATE` statement sets `updated_at = now()` |
+| `updated_at` | timestamptz | Default `now()`. Sequelize sets it on every update |
 | `submitted_at` | timestamptz, nullable | Set once, when submitted |
 
 `length_mm` is not used in pricing; it drives the 3D model and goes into the manufacturing payload.
 
-The `pg` driver returns `numeric` values as strings (to avoid losing precision on very large numbers). Dimensions have at most 4 digits, so they are converted to JavaScript numbers once, when the database connection is set up.
+Sequelize returns `numeric` values as strings (to avoid losing precision on very large numbers). Dimensions have at most 4 digits, so one shared column helper converts them to JavaScript numbers.
 
 ### `quotes`
 
@@ -54,11 +54,11 @@ Only the total is stored. The inputs (thickness, width, expedite) live on the or
 |---|---|---|
 | `id` | uuid | Primary key. Default `uuidv7()` |
 | `order_id` | uuid | Foreign key to `orders`. **Unique**: at most one packet per order |
-| `status` | enum `packet_status` | `Pending` \| `Completed` \| `Failed`. Default `Pending` |
+| `status` | enum `enum_manufacturing_packets_status` | `Pending` \| `Completed` \| `Failed`. Default `Pending` |
 | `payload` | jsonb, nullable | Set only when `Completed` |
 | `error` | text, nullable | Last failure reason. Set only when `Failed` |
 | `created_at` | timestamptz | Default `now()` |
-| `updated_at` | timestamptz | Default `now()`. Every `UPDATE` statement sets `updated_at = now()` |
+| `updated_at` | timestamptz | Default `now()`. Sequelize sets it on every update |
 
 The packet links to the order (not the quote) because the API reads it by order (`GET /orders/{id}/packet`), and each order has at most one quote.
 
@@ -97,7 +97,7 @@ The app is for high-volume order processing, so the design must stay fast as tab
 | `COUNT(*)` for "page X of Y" scans the whole table | No total count. The list returns a `nextCursor`; the UI shows "Load more" |
 | Worker polls for `Pending` packets while `Completed` ones pile up | Index on `manufacturing_packets(status, id)`: the worker jumps straight to the few `Pending` rows, oldest first, however many completed rows exist |
 | Several workers polling at once | Each worker claims packets with `FOR UPDATE SKIP LOCKED`, so no packet is processed twice and workers don't block each other (spec 05) |
-| Many requests quoting or submitting the same order | Single-statement conditional updates (`UPDATE ... WHERE status = 'Draft'`) and unique constraints (`INSERT ... ON CONFLICT DO NOTHING`), not "read then write" checks in code (specs 03, 04) |
+| Many requests quoting or submitting the same order | Single-statement conditional updates (`UPDATE ... WHERE status = 'Draft'`) and unique constraints (a second insert fails with `UniqueConstraintError`), not "read then write" checks in code (specs 03, 04) |
 | Reading a quote or packet by order | The unique constraints on `order_id` already create these indexes |
 | Packet `payload` (jsonb) makes rows wide | List queries select only the columns they show; the payload is read only by `GET /orders/{id}/packet` |
 
@@ -128,14 +128,14 @@ Beyond this (partitioning, archiving, read replicas, connection pooling) is list
 | Packet inserted without `status` | `status = Pending`, `payload = null`, `error = null` | `creates a packet with status Pending` |
 | Dimension with 1 decimal place (e.g. `3.5`) | Stored as `3.5` and returned as the number `3.5` (not the string `"3.5"`) | `stores and returns 1-decimal dimensions as numbers` |
 | Dimension with more than 1 decimal place inserted directly (e.g. `3.55`) | Database rounds to `numeric(3,1)` precision. The API never sends this: it rejects it first (spec 04) | `rounds dimensions to 1 decimal place at the database` |
-| Order updated | `updated_at` changes, `created_at` does not | `updates updated_at but not created_at on update` |
+| Order updated | `updated_at` changes, `created_at` does not | `updates updatedAt but not createdAt on update` |
 | Orders created one after another | Each new `id` sorts after the previous one (UUID v7 is time-ordered) | `generates time-ordered ids` |
 | Migrations applied to an empty database | Tables, enums and exactly the indexes in the index budget exist, no others | `creates exactly the expected indexes` |
 | Migrations run twice | Second run does nothing (already-applied migrations are skipped) | `does not re-apply migrations` |
 
 ## Acceptance criteria
 
-1. SQL migrations create the `orders`, `quotes` and `manufacturing_packets` tables and the `order_status` and `packet_status` enums as described.
+1. The migration creates the `orders`, `quotes` and `manufacturing_packets` tables and their status enums as described.
 2. Defaults apply as described (ids, timestamps, order status, expedite, packet status).
 3. A second quote or packet for the same order is rejected by the database.
 4. A quote or packet cannot reference a non-existent order.

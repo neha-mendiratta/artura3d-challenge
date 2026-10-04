@@ -4,7 +4,7 @@ Last updated: 2026-10-04
 
 ## Status
 
-Phase 0 (Setup) and Phase 1 (Specs) complete. No application code yet.
+Phase 0 (Setup) and Phase 1 (Specs) complete. Phase 2 (Backend) in progress: data model done.
 
 ## How to run
 
@@ -15,6 +15,7 @@ nvm use
 npm install
 cp .env.example .env
 npm run db:up        # starts dev (5432) and test (5433) Postgres, waits until healthy
+npm run db:migrate   # runs sequelize-cli migrations on the dev database (tests migrate the test database themselves)
 npm test             # type-checks (tsc --noEmit), then runs all tests
 npx jest apps/api    # quick run of one package's tests (no type check)
 # inside apps/api or packages/shared, `npm test` calls the root script for that package only
@@ -25,13 +26,14 @@ pgAdmin: host `localhost`, port `5432`, database `artura`, user `artura`, passwo
 
 ## Done
 
-- Spec 01 (data model) approved: 3 tables (`orders`, `quotes`, `manufacturing_packets`), plain SQL with `pg`, UUID v7 ids from PostgreSQL 18, cursor pagination, index budget
+- Spec 01 (data model) approved: 3 tables (`orders`, `quotes`, `manufacturing_packets`), Sequelize models, UUID v7 ids from PostgreSQL 18, cursor pagination, index budget
 - Spec 02 (pricing) approved: one function in `apps/api`, calculated in cents, rounded half up
 - Spec 03 (order workflow) approved: Draft → Submitted, only notes editable after submit, quotes only for Submitted orders
 - Spec 04 (API) approved: 6 brief endpoints + `GET /orders` and `PATCH /orders/{id}/notes`, one error format, idempotent quote
 - Spec 05 (async packet) approved: worker in the API process, `FOR UPDATE SKIP LOCKED`, Completed or Failed, no retries
 - Spec 06 (frontend) approved: orders list, new order and order pages; shared Zod validation; packet status polling
 - Spec 07 (3D preview) approved: box model sized and coloured from the form, orbit controls, WebGL cleanup, measurement labels
+- Data model implemented: Sequelize migration (`apps/api/migrations`), models (`apps/api/src/models`), `config.ts`, `logger.ts`, `db.ts`; 11 tests pass against the test database
 - `docs/recommendations.md`: improvements beyond the brief, for the interview
 - `docs/plan.md`, `docs/conventions.md`, `docs/decisions.md`, spec templates `docs/specs/01–07`
 - Docker Compose: `db` (dev, persistent volume) and `db-test` (in-memory, tests only), Postgres 18
@@ -45,7 +47,11 @@ Nothing.
 
 ## Next step
 
-Phase 2, backend: start with the data model migrations (spec 01).
+Phase 2: pricing (spec 02).
+
+## Notes for later steps
+
+- `OrderStatus` and `PacketStatus` live in their model files for now. Move them to `packages/shared/src/types.ts` when the frontend needs them (Phase 3).
 
 ## Open questions
 
@@ -53,4 +59,4 @@ Phase 2, backend: start with the data model migrations (spec 01).
 
 ## Known issues
 
-- `npm test` fails until code exists: `tsc` reports `TS18003: No inputs were found`, and Jest exits with an error when there are no tests. Resolves itself in Phase 2.
+None.

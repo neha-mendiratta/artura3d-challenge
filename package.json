@@ -11,6 +11,7 @@
   "scripts": {
     "db:up": "docker compose up -d --wait",
     "db:down": "docker compose down",
+    "db:migrate": "npm run migrate -w @artura/api",
     "test": "tsc --noEmit && jest"
   },
   "devDependencies": {
@@ -19,5 +20,8 @@
     "jest": "30.5.2",
     "ts-jest": "29.4.14",
     "typescript": "6.0.3"
+  },
+  "overrides": {
+    "uuid": "^11.1.1"
   }
 }

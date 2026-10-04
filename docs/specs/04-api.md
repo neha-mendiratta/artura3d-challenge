@@ -14,7 +14,7 @@ Status: Approved
 
 ## Behaviour
 
-Express app in `apps/api`. JSON in and out, `camelCase` fields. One `pg` connection pool for the whole app.
+Express app in `apps/api`. JSON in and out, `camelCase` fields. One Sequelize instance (with its connection pool) for the whole app.
 
 ### Endpoints
 
@@ -109,9 +109,8 @@ Checks run in this order: id format (400) → body (400) → order exists (404) 
 
 In one transaction:
 
-1. `INSERT INTO quotes ... ON CONFLICT (order_id) DO NOTHING RETURNING *`
-2. If a row was inserted: create the packet (`Pending`) → 201.
-3. If not: the order already has a quote → return it, 200.
+1. Create the quote and the packet (`Pending`) in one transaction → 201.
+2. If the quote already exists, the unique `order_id` makes the insert fail with `UniqueConstraintError`; the transaction rolls back (no second packet) → return the existing quote, 200.
 
 The unique `order_id` makes this safe when two requests arrive at the same time: only one quote and one packet are ever created.
 

@@ -3,6 +3,13 @@
   "private": true,
   "version": "0.0.0",
   "scripts": {
-    "test": "npm test --prefix ../.. -- apps/api"
+    "test": "npm test --prefix ../.. -- apps/api",
+    "migrate": "node --env-file=../../.env ../../node_modules/sequelize-cli/lib/sequelize db:migrate"
+  },
+  "dependencies": {
+    "pg": "^8.23.1",
+    "pino": "^10.4.0",
+    "sequelize": "^6.37.8",
+    "sequelize-cli": "^6.6.5"
   }
 }
