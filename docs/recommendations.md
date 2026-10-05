@@ -61,3 +61,9 @@ What already holds: ids are UUID v7 (not guessable or countable), invalid ids ar
 - **Authentication:** users sign in through an identity provider (e.g. AWS Cognito or Auth0, OIDC/JWT); every API request carries a token, verified by middleware.
 - **Authorization:** each order belongs to an organisation (lab). Every query includes it, e.g. `WHERE id = :id AND org_id = :userOrg`, so another lab's order returns 404. A hard-to-guess id identifies a record; it never protects it (insecure direct object reference).
 - HTTPS everywhere, rate limiting, and an audit log of who changed which order.
+
+## 7. Hosted deployment
+
+**Today:** the system runs locally with Docker Compose (database and API) and Vite (frontend).
+
+**Recommendation:** host the API image on a container service (e.g. AWS ECS Fargate or App Runner), the database on a managed PostgreSQL (e.g. Amazon RDS), and the frontend as static files on a CDN (e.g. S3 + CloudFront). Only configuration changes: the database connection string and the API URL. Add a CI pipeline that runs `npm test` and builds the image on every push.

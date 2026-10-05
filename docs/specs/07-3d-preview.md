@@ -13,7 +13,7 @@ Status: Implemented
 
 ## Behaviour
 
-One component, `OrthoticPreview`, in `apps/web`, built with react-three-fiber (React for Three.js) and drei (ready-made helpers). It is shown next to the order form (spec 06) and receives `lengthMm`, `widthMm`, `thicknessMm` and `colour` from the form.
+One component, `OrthoticPreview`, in `apps/web`, built with react-three-fiber (React for Three.js) and drei (ready-made helpers). It is shown next to the order form (spec 06) and receives `lengthMm`, `widthMm`, `thicknessMm` and `colour` from the form. It is loaded with `React.lazy`, so three.js is downloaded only when a form is first shown, not with the orders list; an empty box of the same size holds its place while it loads.
 
 - **Model:** a rectangular prism (box). Length, thickness and width map to the box's x, y and z size.
 - **Live dimensions:** the form's dimension fields are the controls. Every change resizes the box immediately.

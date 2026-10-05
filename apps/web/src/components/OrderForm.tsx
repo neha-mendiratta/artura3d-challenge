@@ -1,8 +1,12 @@
 import { DIMENSION_LIMITS, orderInputSchema } from '@artura/shared';
 import { Button, Checkbox, ColorInput, Grid, Group, NumberInput, Stack, Textarea, TextInput } from '@mantine/core';
 import { schemaResolver, useForm } from '@mantine/form';
+import { lazy, Suspense } from 'react';
 import { OrderFormProps } from '../types';
-import { OrthoticPreview } from './OrthoticPreview';
+
+// three.js is large, so the preview is downloaded only when a form is first shown,
+// not with the orders list.
+const OrthoticPreview = lazy(() => import('./OrthoticPreview').then((module) => ({ default: module.OrthoticPreview })));
 
 // 0.1 mm steps, and out-of-range values are shown as errors rather than silently corrected.
 const dimensionProps = {
@@ -92,12 +96,15 @@ export function OrderForm({ initialValues, locked, saving, onSave }: OrderFormPr
         </Grid.Col>
 
         <Grid.Col span={{ base: 12, md: 5 }}>
-          <OrthoticPreview
-            lengthMm={form.values.lengthMm}
-            widthMm={form.values.widthMm}
-            thicknessMm={form.values.thicknessMm}
-            colour={form.values.colour}
-          />
+          {/* An empty box of the same size while it loads, so the layout does not jump. */}
+          <Suspense fallback={<div className="preview" />}>
+            <OrthoticPreview
+              lengthMm={form.values.lengthMm}
+              widthMm={form.values.widthMm}
+              thicknessMm={form.values.thicknessMm}
+              colour={form.values.colour}
+            />
+          </Suspense>
         </Grid.Col>
       </Grid>
     </form>

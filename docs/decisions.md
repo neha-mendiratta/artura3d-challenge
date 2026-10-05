@@ -6,7 +6,7 @@ Short log. Newest at the bottom.
 |---|---|---|---|
 | 1 | Node + TypeScript for the backend | One language across backend, frontend and shared code; shared types and validation | .NET 8 + EF Core |
 | 2 | PostgreSQL in Docker | Allowed by the brief; strong JSON support for the packet payload; same SQL concepts as MySQL | MySQL |
-| 3 | Local-first; hosted deployment at the end | Build without accounts; only the connection string changes when deploying | Hosting from day one |
+| 3 | Runs locally with Docker; no hosted deployment | The brief asks for a working system and setup instructions; Docker Compose starts the database and API with one command and needs no accounts. Only the connection string changes when deploying (see recommendations) | Hosting on a cloud platform |
 | 4 | Express 5 | Most widely used Node framework; small and well understood. Version 5 passes errors from async handlers to the error middleware, so no wrapper code is needed. Request validation uses the shared Zod schemas | Fastify (built-in schema validation), NestJS (too heavy for this size) |
 | 5 | Sequelize (ORM) | The brief asks for an ORM if applicable. Sequelize is mature and widely used with Postgres; typed models with `InferAttributes`. The concurrency-critical parts still map to clear SQL: conditional `update` with `where: { status: 'Draft' }`, a unique constraint surfaced as `UniqueConstraintError`, and `lock` + `skipLocked` for `FOR UPDATE SKIP LOCKED` | Prisma, TypeORM, Drizzle, plain SQL with `pg` |
 | 6 | Zod schemas in a shared package | One set of validation rules for the API and the form | Separate validation per side |
@@ -36,3 +36,4 @@ Short log. Newest at the bottom.
 | 30 | React Testing Library + jsdom for frontend tests | Tests render components and interact like a user (find by text and role, click, type); jsdom simulates the browser in Jest | Testing implementation details (component state) |
 | 31 | Plain `fetch` in one small API client | Built into the browser; one wrapper handles JSON and turns API errors into readable messages | axios |
 | 32 | Dimension limits defined once in `packages/shared` (`DIMENSION_LIMITS`) | Used by the validation schema, the form inputs and the 3D preview; a range cannot differ between them | Repeating the numbers in each place |
+| 33 | 3D preview loaded only when an order form is shown (`React.lazy`) | three.js is most of the frontend's size; the orders list does not need it, so it loads faster | One bundle for every page |
