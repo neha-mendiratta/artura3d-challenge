@@ -1,4 +1,5 @@
-import { PACKET_POLL_INTERVAL_MS } from '../constants';
+import { ConnectionError } from 'sequelize';
+import { PACKET_FAILED_MESSAGE, PACKET_POLL_INTERVAL_MS } from '../constants';
 import { sequelize } from '../db';
 import { logger } from '../logger';
 import { ManufacturingPacket } from '../models/manufacturing-packet';
@@ -8,7 +9,9 @@ import { buildPacketPayload } from '../services/packet-payload';
 
 // Processes the oldest Pending packet; returns false when there is none.
 // The row is locked and other workers skip it, so a packet is never processed twice.
-// If processing stops mid-way, the transaction rolls back and the packet stays Pending.
+// If processing stops mid-way or the database connection fails, the transaction rolls back and
+// the packet stays Pending, so the next poll tries again. Any other error is permanent: Failed.
+// The details go to the log only; the packet keeps a plain message that is safe to show users.
 export async function processNextPacket(): Promise<boolean> {
   let packetId: string | undefined;
   try {
@@ -32,10 +35,12 @@ export async function processNextPacket(): Promise<boolean> {
       return true;
     });
   } catch (err) {
-    if (!packetId) throw err;
+    if (!packetId || err instanceof ConnectionError) throw err;
     logger.error({ err, packetId }, 'Manufacturing packet failed');
-    const message = err instanceof Error ? err.message : String(err);
-    await ManufacturingPacket.update({ status: 'Failed', error: message }, { where: { id: packetId, status: 'Pending' } });
+    await ManufacturingPacket.update(
+      { status: 'Failed', error: PACKET_FAILED_MESSAGE },
+      { where: { id: packetId, status: 'Pending' } },
+    );
     return true;
   }
 }

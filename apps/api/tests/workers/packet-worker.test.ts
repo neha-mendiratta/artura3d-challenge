@@ -1,5 +1,8 @@
+import { ConnectionError } from 'sequelize';
+import { PACKET_FAILED_MESSAGE } from '../../src/constants';
 import { logger } from '../../src/logger';
 import { ManufacturingPacket } from '../../src/models/manufacturing-packet';
+import { Order } from '../../src/models/order';
 import * as packetPayload from '../../src/services/packet-payload';
 import { processNextPacket, startPacketWorker } from '../../src/workers/packet-worker';
 import { insertQuotedOrder, resetDatabase } from '../helpers/db';
@@ -33,8 +36,24 @@ describe('processNextPacket', () => {
     await processNextPacket();
 
     const packet = await findPacket(order.id);
-    expect(packet).toMatchObject({ status: 'Failed', error: 'Payload could not be built', payload: null });
-    expect(logError).toHaveBeenCalled();
+    // Users see a plain message; the real error is only in the log.
+    expect(packet).toMatchObject({ status: 'Failed', error: PACKET_FAILED_MESSAGE, payload: null });
+    expect(logError).toHaveBeenCalledWith(
+      expect.objectContaining({ err: expect.objectContaining({ message: 'Payload could not be built' }) }),
+      'Manufacturing packet failed',
+    );
+  });
+
+  test('keeps the packet Pending when the database connection fails', async () => {
+    const order = await insertQuotedOrder();
+    jest.spyOn(Order, 'findByPk').mockRejectedValueOnce(new ConnectionError(new Error('Connection terminated')));
+
+    await expect(processNextPacket()).rejects.toThrow(ConnectionError);
+    expect((await findPacket(order.id)).status).toBe('Pending');
+
+    // The next poll tries again and succeeds.
+    await processNextPacket();
+    expect((await findPacket(order.id)).status).toBe('Completed');
   });
 
   test('processes a packet only once with two workers', async () => {

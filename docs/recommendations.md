@@ -52,9 +52,9 @@ No code change is needed: the API already reads `DATABASE_URL` from the environm
 
 ## 6. Authentication and authorization
 
-**Today (as per brief):** no login. Anyone who can reach the API and knows an order id can read, edit and submit that order.
+**Today (as per brief):** no login. Anyone who can reach the API can list every order (`GET /orders`) and read, edit and submit any of them. Locally, the API and databases are only reachable from the same machine.
 
-What already holds: ids are UUID v7 (not guessable or countable), invalid ids are rejected before the database, queries are parameterised, and patient data travels in request bodies, not URLs or logs.
+What already holds: ids are UUID v7 (not guessable or countable), invalid ids are rejected before the database, queries are parameterised, patient data travels in request bodies, not URLs, and database error details (which can contain patient data) are hidden in the logs.
 
 **Recommendation for production** (orders relate to patients, so this is health data):
 
@@ -67,3 +67,39 @@ What already holds: ids are UUID v7 (not guessable or countable), invalid ids ar
 **Today:** the system runs locally with Docker Compose (database and API) and Vite (frontend).
 
 **Recommendation:** host the API image on a container service (e.g. AWS ECS Fargate or App Runner), the database on a managed PostgreSQL (e.g. Amazon RDS), and the frontend as static files on a CDN (e.g. S3 + CloudFront). Only configuration changes: the database connection string and the API URL. Add a CI pipeline that runs `npm test` and builds the image on every push.
+
+## 8. Protecting health data
+
+Beyond sign-in (§6), for patient data in production:
+
+- **Encryption:** in transit (HTTPS, and TLS to the database with `sslmode=require`) and at rest (encrypted RDS storage and backups, KMS keys).
+- **Store less:** the packet payload copies the patient ref and notes. Send manufacturing only what it needs (often an order number and the dimensions), so patient data lives in one table.
+- **Guide the free text:** the form already asks for a patient code, not a name. Notes can still hold health details; a short policy for what belongs there helps.
+- **Retention:** decide how long orders are kept, then delete or anonymise them on a schedule.
+- **Logs:** SQL logging (`LOG_LEVEL=debug`) can include values, so keep it off in production, and limit who can read the logs.
+- **HTTP hardening:** security headers (e.g. `helmet`, a Content Security Policy), CORS limited to the app's own domain, rate limiting.
+- **Compliance:** health information is sensitive under privacy law (e.g. Australia's Privacy Act, HIPAA in the US); the steps above support it.
+
+## 9. Database connections at scale
+
+**Today:** Sequelize's default pool: up to 5 connections per API instance; a request waits up to 60 seconds for a free one.
+
+That is plenty here: each request runs a few short queries, so 5 connections serve hundreds of requests per second. At larger scale:
+
+- **Make the pool configurable** (size and wait time from environment variables) and use a short wait (e.g. 5 seconds), so overload fails fast instead of after a minute.
+- **Postgres allows about 100 connections in total**, so instances × pool size must stay below it (5 × 19 ≈ 95). A connection pooler (**PgBouncer** or **RDS Proxy**) lets many instances share a few database connections.
+- **Monitor** how long requests wait for a connection: it is the first sign of overload.
+
+## 10. Graceful shutdown and health check
+
+**Today:** stopping the API ends it straight away. A packet being processed is safe (its transaction rolls back and it stays `Pending`), but HTTP requests in progress are cut off.
+
+**Recommendation for production** (rolling deploys behind a load balancer):
+
+- On `SIGTERM`: stop accepting new requests, let current ones finish, stop the packet worker (`startPacketWorker` already returns a stop function), then close the database pool.
+- A `GET /health` endpoint that checks the database, so the load balancer only sends traffic to working instances.
+
+## 11. Failed packets and late notes
+
+- **Failed packets:** today a `Failed` packet is final, so the order can never reach manufacturing. Temporary database errors already stay `Pending` and are retried. Add a "Retry" action for support once the cause is fixed, or automatic retries with backoff through a queue (§3).
+- **Notes after the packet is built:** notes can change after submit, but the packet is a snapshot. Ask the business whether late notes must reach manufacturing; if so, send an update, or lock notes once the packet is `Completed`.

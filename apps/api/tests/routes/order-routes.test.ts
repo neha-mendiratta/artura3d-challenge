@@ -63,6 +63,11 @@ describe('orders API', () => {
     expect(res.body).toMatchObject({ notes: 'Left foot only', status: 'Submitted' });
   });
 
+  test('returns 404 when updating the notes of a missing order', async () => {
+    const res = await request(app).patch(`/orders/${missingId}/notes`).send({ notes: 'Left foot only' }).expect(404);
+    expect(res.body.error.code).toBe('NOT_FOUND');
+  });
+
   test('rejects a missing field', async () => {
     const { patientRef, ...withoutPatientRef } = validOrder;
     const res = await request(app).post('/orders').send(withoutPatientRef).expect(400);

@@ -124,6 +124,9 @@ The unique `order_id` makes this safe when two requests arrive at the same time:
 | Submit an order | 200, status `Submitted` | `submits an order` |
 | Submit twice | 409 `CONFLICT` | `returns 409 when submitting twice` |
 | Missing required field | 400 `VALIDATION_ERROR` | `rejects a missing field` |
+| Patient ref with spaces around it | Saved trimmed | `trims the patient ref` |
+| Patient ref of 50 characters, notes of 1000 | Accepted | `accepts limits: 50-character patient ref, 1000-character notes` |
+| Patient ref over 50 characters, notes over 1000, whitespace-only patient ref | 400 with a plain message | `explains the problem in plain words` |
 | Dimension out of range or with 2 decimals | 400 | `rejects an invalid dimension` |
 | Colour not `#RRGGBB` | 400 | `rejects an invalid colour` |
 | Unknown field in body | 400 | `rejects unknown fields` |
@@ -131,6 +134,7 @@ The unique `order_id` makes this safe when two requests arrive at the same time:
 | `{id}` is not a UUID | 400 | `rejects an invalid id` |
 | Order does not exist | 404 `NOT_FOUND` | `returns 404 for a missing order` |
 | Update notes on a Submitted order | 200 | `updates notes after submit` |
+| Update notes on a missing order | 404 `NOT_FOUND` | `returns 404 when updating the notes of a missing order` |
 | First quote on a Submitted order | 201, quote with correct `totalCents`, packet `Pending` | `creates a quote and a packet` |
 | Second quote request | 200, same quote, no new packet | `returns the existing quote` |
 | Two quote requests at the same time | One quote, one packet | `creates one quote for concurrent requests` |
@@ -138,6 +142,7 @@ The unique `order_id` makes this safe when two requests arrive at the same time:
 | List with more than 20 orders | First page 20 items + `nextCursor`; next page continues with no duplicates | `pages through orders` |
 | List filtered by status | Only that status | `filters orders by status` |
 | Unexpected error | 500 `INTERNAL_ERROR`, no details, logged | `hides internal errors` |
+| Database error logged | SQL and its values hidden in the log (they can contain patient data) | `hides patient data in database errors` |
 | Unknown route | 404 `NOT_FOUND` as JSON | `returns JSON 404 for unknown routes` |
 | Invalid `status` or `cursor` in list query | 400 | `rejects an invalid list query` |
 | String instead of number or boolean (`"90"`, `"true"`) | 400 | `rejects wrong types` |

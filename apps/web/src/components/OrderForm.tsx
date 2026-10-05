@@ -33,6 +33,7 @@ export function OrderForm({ initialValues, locked, saving, onSave }: OrderFormPr
           <Stack>
             <TextInput
               label="Patient ref"
+              description="The clinic's patient code, not the patient's name"
               disabled={locked}
               {...form.getInputProps('patientRef')}
             />

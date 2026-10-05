@@ -82,6 +82,17 @@ describe('OrderPage', () => {
     expect(screen.queryByRole('button', { name: 'Submit order' })).not.toBeInTheDocument();
   });
 
+  test('does not submit when the confirmation is cancelled', async () => {
+    jest.mocked(getOrder).mockResolvedValue(draft);
+    renderRoute(`/orders/${draft.id}`);
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Submit order' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+
+    expect(submitOrder).not.toHaveBeenCalled();
+    expect(screen.getByRole('button', { name: 'Submit order' })).toBeInTheDocument();
+  });
+
   test('shows the quote total', async () => {
     const quoted = { ...submitted, quote: { id: 'q1', orderId: submitted.id, totalCents: 17509, createdAt: '' } };
     jest.mocked(getOrder).mockResolvedValueOnce(submitted).mockResolvedValue(quoted);

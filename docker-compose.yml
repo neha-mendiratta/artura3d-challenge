@@ -1,3 +1,5 @@
+# Ports are published on 127.0.0.1 only, so the databases and the API (patient data)
+# cannot be reached from other machines on the network.
 services:
   db:
     image: postgres:18-alpine
@@ -6,7 +8,7 @@ services:
       POSTGRES_PASSWORD: artura
       POSTGRES_DB: artura
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"
     volumes:
       - db-data:/var/lib/postgresql
     healthcheck:
@@ -24,7 +26,7 @@ services:
       POSTGRES_PASSWORD: artura
       POSTGRES_DB: artura_test
     ports:
-      - "5433:5432"
+      - "127.0.0.1:5433:5432"
     tmpfs:
       - /var/lib/postgresql
     healthcheck:
@@ -40,7 +42,7 @@ services:
     environment:
       DATABASE_URL: postgresql://artura:artura@db:5432/artura
     ports:
-      - "3000:3000"
+      - "127.0.0.1:3000:3000"
     depends_on:
       db:
         condition: service_healthy

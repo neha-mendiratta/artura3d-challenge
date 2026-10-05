@@ -62,7 +62,10 @@ Runs inside the API process (`src/workers/packet-worker.ts`). Every second it pr
 2. Read the order and its quote, build the payload.
 3. Save the payload, set status `Completed`.
 
-If step 2 or 3 throws: roll back, set status `Failed` with the error message, and log it with pino.
+If step 2 or 3 throws: roll back, then:
+
+- **Database connection error** (temporary): the packet stays `Pending` and the next poll tries again.
+- **Any other error** (permanent): status `Failed`, and the error is logged with pino. The packet's `error` is a fixed message, "The manufacturing packet could not be generated. The error has been logged for support.", because it is shown to users and must not reveal internal details. The real error is only in the log, with the packet id.
 
 - `lock` (`FOR UPDATE`) locks the claimed row; `skipLocked` (`SKIP LOCKED`) makes other workers skip it, so a packet is never processed twice, even with several workers.
 - If the API stops mid-processing, the transaction is rolled back and the packet is still `Pending`, so it is processed after restart.
@@ -103,7 +106,8 @@ If step 2 or 3 throws: roll back, set status `Failed` with the error message, an
 | Order without a quote (cannot happen through the API) | Payload builder throws, so the packet is marked `Failed` | `throws when the order has no quote` |
 | Worker started | Pending packets are completed in the background | `processes packets in the background` |
 | No `Pending` packets | Nothing changes | `does nothing when no packet is pending` |
-| Processing throws (simulated) | `Failed`, error message saved, payload null, logged | `marks the packet failed on error` |
+| Processing throws (simulated) | `Failed`, fixed message saved, payload null, real error logged | `marks the packet failed on error` |
+| Database connection fails during processing | Still `Pending`; the next poll completes it | `keeps the packet Pending when the database connection fails` |
 | Two workers run at the same time, one `Pending` packet | Processed once | `processes a packet only once with two workers` |
 | `Completed` or `Failed` packet | Not processed again | `does not reprocess finished packets` |
 

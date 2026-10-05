@@ -92,6 +92,6 @@ Edge cases are never out of scope: see [conventions.md](conventions.md).
 
 ### Phase 5: Wrap-up
 
-- [ ] README with setup instructions
+- [x] README with setup instructions
 - [ ] Interview talking points (`docs/talking-points.md`)
 - [ ] Final `HANDOFF.md`

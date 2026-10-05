@@ -37,3 +37,6 @@ Short log. Newest at the bottom.
 | 31 | Plain `fetch` in one small API client | Built into the browser; one wrapper handles JSON and turns API errors into readable messages | axios |
 | 32 | Dimension limits defined once in `packages/shared` (`DIMENSION_LIMITS`) | Used by the validation schema, the form inputs and the 3D preview; a range cannot differ between them | Repeating the numbers in each place |
 | 33 | 3D preview loaded only when an order form is shown (`React.lazy`) | three.js is most of the frontend's size; the orders list does not need it, so it loads faster | One bundle for every page |
+| 34 | Database error details hidden in logs (pino `redact`) | Sequelize errors carry the SQL and its values, which can include patient refs and notes; logs are often sent to other services | Not logging error objects at all (loses the error type and stack) |
+| 35 | Docker ports published on `127.0.0.1` only | The databases and the API hold patient data; by default Docker makes them reachable from other machines on the network | Publishing on all interfaces (Docker's default) |
+| 36 | A failed packet stores a fixed message; the real error is only logged | The packet's error is shown to users and must not reveal internals; support finds the details in the log by packet id | Storing the raw error message |

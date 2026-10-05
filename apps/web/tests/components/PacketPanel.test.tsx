@@ -30,10 +30,10 @@ describe('PacketPanel', () => {
   });
 
   test('shows a failed packet', async () => {
-    jest.mocked(getPacket).mockResolvedValue(makePacket({ status: 'Failed', error: 'Payload could not be built' }));
+    jest.mocked(getPacket).mockResolvedValue(makePacket({ status: 'Failed', error: 'The manufacturing packet could not be generated. The error has been logged for support.' }));
     renderComponent(<PacketPanel orderId="o1" />);
 
     expect(await screen.findByText('Failed')).toBeInTheDocument();
-    expect(screen.getByText('Payload could not be built')).toBeInTheDocument();
+    expect(screen.getByText('The manufacturing packet could not be generated. The error has been logged for support.')).toBeInTheDocument();
   });
 });

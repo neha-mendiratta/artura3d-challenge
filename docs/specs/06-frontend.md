@@ -45,11 +45,12 @@ flowchart LR
 - **Draft:** form editable; "Save" and "Submit" buttons. Submit asks for confirmation first.
 - **Submitted:** all fields disabled except Notes, which has its own "Save notes" button. "Generate quote" button until a quote exists.
 - **Quote:** shows the total, e.g. `175.09`.
-- **Packet:** status badge (Pending / Completed / Failed). While Pending, the page checks every 2 seconds and stops once it is Completed or Failed. Failed shows the error message.
+- **Packet:** status badge (Pending / Completed / Failed). While Pending, the page checks every 2 seconds and stops once it is Completed or Failed. Failed shows the packet's error message (a plain message, see spec 05).
 
 ### Form
 
 - Validated with the same Zod schema as the API (`packages/shared`), so the rules cannot differ.
+- Patient ref has a hint: "The clinic's patient code, not the patient's name", so names are not stored.
 - Errors show under each field.
 - Dimensions use number inputs with the allowed range and 0.1 steps.
 - Colour uses a colour picker.
@@ -83,6 +84,7 @@ Jest with React Testing Library in a browser-like environment (jsdom). The API i
 | Save gets a 409 (changed elsewhere) | Message shown, order reloaded (form locks if now Submitted) | `reloads the order after a conflict` |
 | Submitted order | Fields disabled except Notes | `disables editing when submitted` |
 | Submit clicked | Confirmation, then status shows Submitted | `submits an order after confirmation` |
+| Submit confirmation cancelled | Nothing sent, order stays Draft | `does not submit when the confirmation is cancelled` |
 | Generate quote clicked | Total shown | `shows the quote total` |
 | Packet Pending, then Completed | Badge updates, checking stops | `polls packet status until finished` |
 | Packet Failed | Error message shown | `shows a failed packet` |
