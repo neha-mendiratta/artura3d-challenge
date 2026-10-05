@@ -53,3 +53,9 @@ export type OrderFormProps = {
   saving: boolean;
   onSave: (values: OrderInput) => void;
 };
+
+export type StatusBadgeProps = { status: OrderStatus | PacketStatus };
+
+export type OrderProps = { order: Order };
+
+export type OrderIdProps = { orderId: string };

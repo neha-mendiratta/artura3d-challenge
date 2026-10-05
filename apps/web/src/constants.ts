@@ -10,3 +10,6 @@ export const NEW_ORDER_DEFAULTS: OrderInput = {
   expedite: false,
   notes: null,
 };
+
+// How often the order page checks a Pending manufacturing packet.
+export const PACKET_POLL_INTERVAL_MS = 2000;

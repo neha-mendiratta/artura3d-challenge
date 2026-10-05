@@ -1,6 +1,6 @@
 # Frontend
 
-Status: Approved
+Status: Implemented
 
 ## Source
 
@@ -82,7 +82,7 @@ Jest with React Testing Library in a browser-like environment (jsdom). The API i
 | Notes saved on a Submitted order | Only the notes request is sent | `saves only the notes of a submitted order` |
 | Save gets a 409 (changed elsewhere) | Message shown, order reloaded (form locks if now Submitted) | `reloads the order after a conflict` |
 | Submitted order | Fields disabled except Notes | `disables editing when submitted` |
-| Submit clicked | Confirmation, then status shows Submitted | `submits an order` |
+| Submit clicked | Confirmation, then status shows Submitted | `submits an order after confirmation` |
 | Generate quote clicked | Total shown | `shows the quote total` |
 | Packet Pending, then Completed | Badge updates, checking stops | `polls packet status until finished` |
 | Packet Failed | Error message shown | `shows a failed packet` |

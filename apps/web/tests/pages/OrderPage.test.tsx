@@ -1,8 +1,8 @@
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ApiError } from '../../src/api/client';
-import { getOrder, updateNotes, updateOrder } from '../../src/api/orders';
-import { makeOrder } from '../helpers/fixtures';
+import { createQuote, getOrder, getPacket, submitOrder, updateNotes, updateOrder } from '../../src/api/orders';
+import { makeOrder, makePacket } from '../helpers/fixtures';
 import { renderRoute } from '../helpers/render';
 
 jest.mock('../../src/api/orders');
@@ -65,5 +65,34 @@ describe('OrderPage', () => {
     renderRoute('/orders/missing');
 
     expect(await screen.findByText('Order not found')).toBeInTheDocument();
+  });
+
+  test('submits an order after confirmation', async () => {
+    jest.mocked(getOrder).mockResolvedValue(draft);
+    jest.mocked(submitOrder).mockResolvedValue({ ...submitted, updatedAt: 'later' });
+    renderRoute(`/orders/${draft.id}`);
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Submit order' }));
+    expect(screen.getByText('After submitting, only the notes can be changed.')).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+
+    expect(submitOrder).toHaveBeenCalledWith(draft.id);
+    expect(await screen.findByText('Submitted')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Generate quote' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Submit order' })).not.toBeInTheDocument();
+  });
+
+  test('shows the quote total', async () => {
+    const quoted = { ...submitted, quote: { id: 'q1', orderId: submitted.id, totalCents: 17509, createdAt: '' } };
+    jest.mocked(getOrder).mockResolvedValueOnce(submitted).mockResolvedValue(quoted);
+    jest.mocked(createQuote).mockResolvedValue(quoted.quote);
+    jest.mocked(getPacket).mockResolvedValue(makePacket({ status: 'Completed' }));
+    renderRoute(`/orders/${submitted.id}`);
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Generate quote' }));
+
+    expect(createQuote).toHaveBeenCalledWith(submitted.id);
+    expect(await screen.findByText('Quote: 175.09')).toBeInTheDocument();
+    expect(await screen.findByText('Completed')).toBeInTheDocument();
   });
 });

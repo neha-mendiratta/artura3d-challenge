@@ -1,7 +1,7 @@
 import { OrderInput, OrderStatus } from '@artura/shared';
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ApiError } from '../api/client';
-import { createOrder, getOrder, listOrders, updateNotes, updateOrder } from '../api/orders';
+import { createOrder, createQuote, getOrder, listOrders, submitOrder, updateNotes, updateOrder } from '../api/orders';
 import { Order } from '../types';
 
 // Pages through the orders list: each page starts at the previous page's nextCursor.
@@ -36,8 +36,28 @@ function useOrderMutation<Variables>(id: string | undefined, save: (variables: V
   });
 }
 
-export const useCreateOrder = () => useOrderMutation(undefined, (input: OrderInput) => createOrder(input));
+// Wrapped so only the input is passed (TanStack Query also passes an internal context argument).
+export const useCreateOrder = () =>
+  useOrderMutation(undefined, (input: OrderInput) => createOrder(input));
 
-export const useUpdateOrder = (id: string) => useOrderMutation(id, (input: OrderInput) => updateOrder(id, input));
+export const useUpdateOrder = (id: string) =>
+  useOrderMutation(id, (input: OrderInput) => updateOrder(id, input));
 
-export const useUpdateNotes = (id: string) => useOrderMutation(id, (notes: string | null) => updateNotes(id, notes));
+export const useUpdateNotes = (id: string) =>
+  useOrderMutation(id, (notes: string | null) => updateNotes(id, notes));
+
+export const useSubmitOrder = (id: string) =>
+  useOrderMutation(id, () => submitOrder(id));
+
+// The quote is part of the order, and creating it also creates the packet, so both are refreshed.
+export function useCreateQuote(id: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: () => createQuote(id),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['order', id] });
+      void queryClient.invalidateQueries({ queryKey: ['packet', id] });
+      void queryClient.invalidateQueries({ queryKey: ['orders'] });
+    },
+  });
+}

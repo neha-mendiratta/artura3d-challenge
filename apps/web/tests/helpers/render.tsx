@@ -7,22 +7,29 @@ import { createMemoryRouter, RouterProvider } from 'react-router';
 import { createQueryClient } from '../../src/query-client';
 import { routes } from '../../src/routes';
 
-// Renders the real app at the given URL, with the same providers as main.tsx.
-export function renderRoute(path: string) {
+// The same providers as main.tsx. env="test" turns off Mantine's animations so dialogs open instantly.
+function Providers({ children }: { children: ReactElement }) {
   const queryClient = createQueryClient();
   queryClient.setDefaultOptions({ queries: { retry: false } });
-  const router = createMemoryRouter(routes, { initialEntries: [path] });
-  return render(
-    <MantineProvider>
+  return (
+    <MantineProvider env="test">
       <Notifications />
-      <QueryClientProvider client={queryClient}>
-        <RouterProvider router={router} />
-      </QueryClientProvider>
-    </MantineProvider>,
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    </MantineProvider>
   );
 }
 
-// Renders one component with Mantine around it, for component tests.
+// Renders the real app at the given URL.
+export function renderRoute(path: string) {
+  const router = createMemoryRouter(routes, { initialEntries: [path] });
+  return render(
+    <Providers>
+      <RouterProvider router={router} />
+    </Providers>,
+  );
+}
+
+// Renders one component on its own, for component tests.
 export function renderComponent(ui: ReactElement) {
-  return render(<MantineProvider>{ui}</MantineProvider>);
+  return render(<Providers>{ui}</Providers>);
 }

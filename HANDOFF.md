@@ -4,7 +4,7 @@ Last updated: 2026-10-05
 
 ## Status
 
-Phase 0 (Setup) and Phase 1 (Specs) complete. Phase 0, 1 and 2 (Backend) complete. Phase 3 (Frontend) in progress: app shell, routing, API client, orders list and order form done.
+Phase 0 (Setup) and Phase 1 (Specs) complete. Phases 0–3 complete (setup, specs, backend, frontend). Next: Phase 4, 3D preview.
 
 ## How to run
 
@@ -38,6 +38,7 @@ pgAdmin: host `localhost`, port `5432`, database `artura`, user `artura`, passwo
 - Spec 07 (3D preview) approved: box model sized and coloured from the form, orbit controls, WebGL cleanup, measurement labels
 - Data model implemented: Sequelize migration (`apps/api/migrations`), models (`apps/api/src/models`), `config.ts`, `logger.ts`, `db.ts`; 11 tests pass against the test database
 - Pricing implemented: `apps/api/src/pricing.ts`, 4 unit tests
+- Order page workflow: `SubmitOrderButton` (confirmation dialog), `QuotePanel` (Generate quote, total), `PacketPanel` + `hooks/packet.ts` (polls every 2 s while Pending, then stops); 113 tests in total
 - Order form: `components/OrderForm.tsx` (shared Zod schema via Mantine `schemaResolver`, locked except notes when Submitted), new order and order pages, `hooks/orders.ts` mutations, `query-client.ts` (global error notification), `constants.ts` (new order defaults)
 - Orders list page: `pages/OrdersListPage.tsx`, `hooks/orders.ts` (`useOrders`, infinite query with cursor), `components/StatusBadge.tsx`; status filter, Load more, empty and error states
 - Frontend shell: `apps/web` (Vite, React, Mantine, TanStack Query, React Router 7); `api/` client and endpoint functions, layout, routes for the 3 pages (titles only so far), `utils/format.ts`; status types moved to `packages/shared`
@@ -58,7 +59,7 @@ Nothing.
 
 ## Next step
 
-Phase 3: submit, quote and packet status on the order page (spec 06).
+Phase 4: 3D preview (spec 07), next to the order form on the new order and order pages.
 
 ## Open questions
 
