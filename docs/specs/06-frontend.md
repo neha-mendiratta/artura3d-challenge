@@ -77,13 +77,16 @@ Jest with React Testing Library in a browser-like environment (jsdom). The API i
 | More orders than one page | "Load more" adds the next page below | `loads the next page` |
 | No orders | "No orders yet." | `shows a message when there are no orders` |
 | Invalid value (e.g. width 200) | Error under the field, nothing sent | `shows a validation error` |
-| Valid new order saved | Create request sent, order page opens | `creates an order` |
+| Valid new order saved | Create request sent, order page opens | `creates an order and opens it` |
+| Draft order saved | Update request sent, form shows the saved values | `saves a draft order` |
+| Notes saved on a Submitted order | Only the notes request is sent | `saves only the notes of a submitted order` |
+| Save gets a 409 (changed elsewhere) | Message shown, order reloaded (form locks if now Submitted) | `reloads the order after a conflict` |
 | Submitted order | Fields disabled except Notes | `disables editing when submitted` |
 | Submit clicked | Confirmation, then status shows Submitted | `submits an order` |
 | Generate quote clicked | Total shown | `shows the quote total` |
 | Packet Pending, then Completed | Badge updates, checking stops | `polls packet status until finished` |
 | Packet Failed | Error message shown | `shows a failed packet` |
-| Request in progress | Button disabled | `disables a button while saving` |
+| Request in progress | Button disabled | `disables the button while saving` |
 | API returns an error | Notification with the message | `shows API errors` |
 
 ## Acceptance criteria

@@ -92,7 +92,7 @@ Packet:
 
 Dates are ISO 8601 in UTC.
 
-Errors: `{ "error": { "code": "...", "message": "..." } }` with `code` one of `VALIDATION_ERROR` (400), `NOT_FOUND` (404), `CONFLICT` (409), `INTERNAL_ERROR` (500). A 400 message names the field, e.g. `"widthMm: must be between 50 and 150"`. A 500 never shows internal details; it is logged. Unknown routes return 404 `NOT_FOUND` as JSON.
+Errors: `{ "error": { "code": "...", "message": "..." } }` with `code` one of `VALIDATION_ERROR` (400), `NOT_FOUND` (404), `CONFLICT` (409), `INTERNAL_ERROR` (500). A 400 message names the field, e.g. `"widthMm: Width must be between 50 and 150 mm"`. A 500 never shows internal details; it is logged. Unknown routes return 404 `NOT_FOUND` as JSON.
 
 Checks run in this order: id format (400) → body (400) → order exists (404) → status (409).
 

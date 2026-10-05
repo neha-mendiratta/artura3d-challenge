@@ -26,4 +26,14 @@ describe('orderInputSchema', () => {
   ])('normalises notes %p to %p', (notes, expected) => {
     expect(orderInputSchema.parse({ ...validOrder, notes }).notes).toBe(expected);
   });
+
+  test.each([
+    [{ patientRef: '  ' }, 'Patient ref is required'],
+    [{ widthMm: 200 }, 'Width must be between 50 and 150 mm'],
+    [{ thicknessMm: 3.55 }, 'Thickness can have at most 1 decimal place'],
+    [{ colour: 'blue' }, 'Colour must be a hex colour like #3366FF'],
+  ])('explains the problem in plain words for %p', (change, message) => {
+    const result = orderInputSchema.safeParse({ ...validOrder, ...change });
+    expect(result.error?.issues[0]?.message).toBe(message);
+  });
 });

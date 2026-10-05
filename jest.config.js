@@ -22,7 +22,7 @@ module.exports = {
     },
     {
       displayName: 'web',
-      testEnvironment: 'jsdom',
+      testEnvironment: '<rootDir>/apps/web/tests/setup/jsdom-environment.js',
       roots: ['<rootDir>/apps/web'],
       transform: {
         '^.+\\.tsx?$': ['ts-jest', { tsconfig: { rootDir: __dirname, jsx: 'react-jsx', module: 'commonjs', isolatedModules: true } }],

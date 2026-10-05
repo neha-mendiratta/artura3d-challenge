@@ -2,26 +2,37 @@ import { z } from 'zod';
 
 const hasAtMostOneDecimal = (value: number) => Math.abs(value * 10 - Math.round(value * 10)) < 1e-9;
 
-const dimension = (min: number, max: number) =>
-  z.number().min(min).max(max).refine(hasAtMostOneDecimal, 'must have at most 1 decimal place');
+// Messages are written for the person filling in the form; the API returns the same ones.
+const dimension = (label: string, min: number, max: number) => {
+  const range = `${label} must be between ${min} and ${max} mm`;
+  return z
+    .number({ error: `${label} must be a number` })
+    .min(min, range)
+    .max(max, range)
+    .refine(hasAtMostOneDecimal, `${label} can have at most 1 decimal place`);
+};
 
 // Empty or whitespace-only notes are stored as null.
 const notes = z
   .string()
   .trim()
-  .max(1000)
+  .max(1000, 'Notes must be 1000 characters or fewer')
   .transform((value) => value || null)
   .nullable()
   .default(null);
 
 export const orderInputSchema = z.strictObject({
-  patientRef: z.string().trim().min(1).max(50),
-  lengthMm: dimension(150, 350),
-  widthMm: dimension(50, 150),
-  thicknessMm: dimension(1, 15),
+  patientRef: z
+    .string({ error: 'Patient ref is required' })
+    .trim()
+    .min(1, 'Patient ref is required')
+    .max(50, 'Patient ref must be 50 characters or fewer'),
+  lengthMm: dimension('Length', 150, 350),
+  widthMm: dimension('Width', 50, 150),
+  thicknessMm: dimension('Thickness', 1, 15),
   colour: z
     .string()
-    .regex(/^#[0-9a-fA-F]{6}$/, 'must be a hex colour like #3366FF')
+    .regex(/^#[0-9a-fA-F]{6}$/, 'Colour must be a hex colour like #3366FF')
     .transform((value) => value.toUpperCase()),
   expedite: z.boolean().default(false),
   notes,

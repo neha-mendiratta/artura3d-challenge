@@ -81,7 +81,7 @@ Edge cases are never out of scope: see [conventions.md](conventions.md).
 
 - [x] App shell, routing, API client
 - [x] Orders list
-- [ ] Order form (create, edit, validation, locked when Submitted)
+- [x] Order form (create, edit, validation, locked when Submitted)
 - [ ] Submit, quote, packet status
 
 ### Phase 4: 3D preview

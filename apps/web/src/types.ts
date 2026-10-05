@@ -1,4 +1,4 @@
-import { OrderStatus, PacketStatus } from '@artura/shared';
+import { OrderInput, OrderStatus, PacketStatus } from '@artura/shared';
 
 export type Quote = {
   id: string;
@@ -45,3 +45,11 @@ export type RequestOptions = {
 
 // The orders list filter: every order, or one status.
 export type OrderFilter = 'All' | OrderStatus;
+
+export type OrderFormProps = {
+  initialValues: OrderInput;
+  // Submitted orders: every field is read-only except notes.
+  locked: boolean;
+  saving: boolean;
+  onSave: (values: OrderInput) => void;
+};
