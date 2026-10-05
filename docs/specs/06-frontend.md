@@ -72,6 +72,10 @@ Jest with React Testing Library in a browser-like environment (jsdom). The API i
 
 | Situation | Expected | Test |
 |---|---|---|
+| Orders list loads | Table shows each order with status, dimensions, quote total, created date; patient ref links to the order | `shows the orders from the API` |
+| Status filter changed | List reloads with that status | `filters by status` |
+| More orders than one page | "Load more" adds the next page below | `loads the next page` |
+| No orders | "No orders yet." | `shows a message when there are no orders` |
 | Invalid value (e.g. width 200) | Error under the field, nothing sent | `shows a validation error` |
 | Valid new order saved | Create request sent, order page opens | `creates an order` |
 | Submitted order | Fields disabled except Notes | `disables editing when submitted` |

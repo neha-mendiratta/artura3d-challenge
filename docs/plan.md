@@ -80,7 +80,7 @@ Edge cases are never out of scope: see [conventions.md](conventions.md).
 ### Phase 3: Frontend
 
 - [x] App shell, routing, API client
-- [ ] Orders list
+- [x] Orders list
 - [ ] Order form (create, edit, validation, locked when Submitted)
 - [ ] Submit, quote, packet status
 

@@ -42,3 +42,6 @@ export type RequestOptions = {
   method?: string;
   body?: unknown;
 };
+
+// The orders list filter: every order, or one status.
+export type OrderFilter = 'All' | OrderStatus;

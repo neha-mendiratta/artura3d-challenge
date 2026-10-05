@@ -5,8 +5,8 @@ export function Layout() {
   return (
     <AppShell header={{ height: 56 }} padding="md">
       <AppShell.Header>
-        <Group h="100%" px="md">
-          <Anchor component={Link} to="/" c="inherit" underline="never">
+        <Group className="app-header">
+          <Anchor component={Link} to="/" className="app-home-link">
             <Title order={3}>Artura3D · Orthotic orders</Title>
           </Anchor>
         </Group>

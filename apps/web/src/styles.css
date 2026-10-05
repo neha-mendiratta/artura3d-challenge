@@ -1,0 +1,19 @@
+/* App-specific styles. Mantine's own look comes from its stylesheets, imported in main.tsx. */
+
+.app-header {
+  height: 100%;
+  padding: 0 var(--mantine-spacing-md);
+}
+
+.app-home-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.fit-content {
+  width: fit-content;
+}
+
+.muted {
+  color: var(--mantine-color-dimmed);
+}

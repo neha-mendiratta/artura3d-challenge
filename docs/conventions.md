@@ -15,6 +15,7 @@
 - Single responsibility: each file does one job (e.g. config, database connection, logger, one feature's queries, one feature's routes). No file holds everything.
 - API folders by layer: `routes/` (HTTP only), `services/` (business rules), `middleware/` (validation, error handling), `models/` (Sequelize models), `workers/` (background jobs).
 - Web folders by layer: `api/` (HTTP calls), `hooks/` (data loading and mutations with TanStack Query), `pages/` (one per route), `components/` (UI pieces), `utils/` (formatting).
+- Styling: Mantine component options stay as props (`color`, `variant`, `justify`, `order`); all custom styling (sizes, spacing, colours) is a class in `apps/web/src/styles.css`. No inline style props.
 - Reuse, don't repeat: shared helpers live in one place and are imported, never copied into each file.
 - Written to scale: no work per request that grows with table size, no in-memory state that breaks with several API instances.
 
