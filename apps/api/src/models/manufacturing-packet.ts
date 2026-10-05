@@ -1,6 +1,6 @@
 import { CreationOptional, DataTypes, InferAttributes, InferCreationAttributes, Model } from 'sequelize';
 import { sequelize } from '../db';
-import { PacketStatus } from '../types';
+import { PacketStatus } from '@artura/shared';
 import { idColumn } from './shared-columns';
 
 export class ManufacturingPacket extends Model<

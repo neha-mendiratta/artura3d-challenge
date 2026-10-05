@@ -4,11 +4,12 @@ import { ConflictError } from '../errors';
 import { ManufacturingPacket } from '../models/manufacturing-packet';
 import { Quote } from '../models/quote';
 import { calculatePriceCents } from '../pricing';
+import { QuoteResult } from '../types';
 import { getOrder } from './order-service';
 
 // Idempotent: the first call creates the quote and its Pending packet atomically; later calls
 // return the same quote. The unique order_id prevents duplicates, including for concurrent requests.
-export async function createQuote(orderId: string): Promise<{ quote: Quote; created: boolean }> {
+export async function createQuote(orderId: string): Promise<QuoteResult> {
   const order = await getOrder(orderId);
   if (order.status !== 'Submitted') {
     throw new ConflictError('Only Submitted orders can be quoted');

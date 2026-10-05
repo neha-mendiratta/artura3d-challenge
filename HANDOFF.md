@@ -4,7 +4,7 @@ Last updated: 2026-10-05
 
 ## Status
 
-Phase 0 (Setup) and Phase 1 (Specs) complete. Phase 0, 1 and 2 (Backend) complete. Next: Phase 3, frontend.
+Phase 0 (Setup) and Phase 1 (Specs) complete. Phase 0, 1 and 2 (Backend) complete. Phase 3 (Frontend) in progress: app shell, routing and API client done.
 
 ## How to run
 
@@ -18,7 +18,8 @@ npm run db:up        # starts only the dev (5432) and test (5433) databases, wai
 npm run db:migrate   # runs sequelize-cli migrations on the dev database (tests migrate the test database themselves)
 npm run dev:api      # starts the API on http://localhost:3000 with reload on save
 npm run app:up       # or: builds and runs the API in Docker (port 3000) with its database; runs migrations on start
-npm test             # type-checks (tsc --noEmit), then runs all tests
+npm run dev:web      # frontend on http://localhost:5173 (needs the API on :3000); run `nvm use` first, Vite needs Node 22
+npm test             # type-checks the backend and the frontend, then runs all tests
 npx jest apps/api    # quick run of one package's tests (no type check)
 # inside apps/api or packages/shared, `npm test` calls the root script for that package only
 npm run db:down      # stops the databases (dev data is kept in a Docker volume)
@@ -37,6 +38,7 @@ pgAdmin: host `localhost`, port `5432`, database `artura`, user `artura`, passwo
 - Spec 07 (3D preview) approved: box model sized and coloured from the form, orbit controls, WebGL cleanup, measurement labels
 - Data model implemented: Sequelize migration (`apps/api/migrations`), models (`apps/api/src/models`), `config.ts`, `logger.ts`, `db.ts`; 11 tests pass against the test database
 - Pricing implemented: `apps/api/src/pricing.ts`, 4 unit tests
+- Frontend shell: `apps/web` (Vite, React, Mantine, TanStack Query, React Router 7); `api/` client and endpoint functions, layout, routes for the 3 pages (titles only so far), `utils/format.ts`; status types moved to `packages/shared`; 88 tests in total
 - API runs in Docker: `apps/api/Dockerfile` (node:22-alpine, production dependencies only, non-root user, migrations on start), `api` service in Docker Compose, `.dockerignore`
 - Packet worker implemented: `workers/packet-worker.ts` (claims with FOR UPDATE SKIP LOCKED, drains all Pending packets every second), `services/packet-payload.ts`; started by `server.ts`; 77 tests in total
 - API endpoints implemented: orders list (cursor pages, status filter), idempotent quote (`services/quote-service.ts`), packet (`services/packet-service.ts`)
@@ -54,11 +56,7 @@ Nothing.
 
 ## Next step
 
-Phase 3: frontend (spec 06). Start with the app shell, routing and API client.
-
-## Notes for later steps
-
-- `OrderStatus` and `PacketStatus` are in `apps/api/src/types.ts`. Move them to `packages/shared` when the frontend needs them (Phase 3).
+Phase 3: orders list page (spec 06).
 
 ## Open questions
 

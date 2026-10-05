@@ -20,5 +20,15 @@ module.exports = {
       roots: ['<rootDir>/packages/shared'],
       transform,
     },
+    {
+      displayName: 'web',
+      testEnvironment: 'jsdom',
+      roots: ['<rootDir>/apps/web'],
+      transform: {
+        '^.+\\.tsx?$': ['ts-jest', { tsconfig: { rootDir: __dirname, jsx: 'react-jsx', module: 'commonjs', isolatedModules: true } }],
+      },
+      moduleNameMapper: { '\\.css$': '<rootDir>/apps/web/tests/setup/style-stub.ts' },
+      setupFilesAfterEnv: ['<rootDir>/apps/web/tests/setup/jsdom.ts'],
+    },
   ],
 };

@@ -12,7 +12,7 @@ A small full-stack app for creating and processing custom orthotic manufacturing
 |---|---|
 | Backend | Node 22 + TypeScript 6, Express 5, Sequelize (ORM), `sequelize-cli` migrations, pino |
 | Database | PostgreSQL 18 in Docker (dev + separate test database) |
-| Frontend | React + TypeScript, Vite, Mantine, TanStack Query, React Router, react-three-fiber |
+| Frontend | React 19 + TypeScript, Vite 8, Mantine 9, TanStack Query, React Router 7, react-three-fiber |
 | Shared | TypeScript package: Zod schemas, status types |
 | Tests | Jest (backend and frontend) |
 | Repo | npm workspaces |
@@ -79,7 +79,7 @@ Edge cases are never out of scope: see [conventions.md](conventions.md).
 
 ### Phase 3: Frontend
 
-- [ ] App shell, routing, API client
+- [x] App shell, routing, API client
 - [ ] Orders list
 - [ ] Order form (create, edit, validation, locked when Submitted)
 - [ ] Submit, quote, packet status

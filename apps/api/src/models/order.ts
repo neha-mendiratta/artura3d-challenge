@@ -7,7 +7,7 @@ import {
   NonAttribute,
 } from 'sequelize';
 import { sequelize } from '../db';
-import { OrderStatus } from '../types';
+import { OrderStatus } from '@artura/shared';
 import type { Quote } from './quote';
 import { decimalColumn, idColumn } from './shared-columns';
 

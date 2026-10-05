@@ -1,10 +1,9 @@
-import { OrderInput } from '@artura/shared';
+import { OrderInput, OrderListFilter } from '@artura/shared';
 import { InferAttributes, Op, WhereOptions } from 'sequelize';
 import { ORDERS_PAGE_SIZE } from '../constants';
 import { ConflictError, NotFoundError } from '../errors';
 import { Order } from '../models/order';
 import { Quote } from '../models/quote';
-import { OrderStatus } from '../types';
 
 export async function getOrder(id: string): Promise<Order> {
   const order = await Order.findByPk(id, { include: { model: Quote, as: 'quote' } });
@@ -16,7 +15,7 @@ export async function getOrder(id: string): Promise<Order> {
 
 // Newest first. uuidv7 ids are time-ordered, so the cursor is simply the last id of the previous page.
 // One extra row is fetched to know whether another page exists, without a COUNT(*).
-export async function listOrders(filter: { status?: OrderStatus; cursor?: string }) {
+export async function listOrders(filter: OrderListFilter) {
   const where: WhereOptions<Order> = {};
   if (filter.status) where.status = filter.status;
   if (filter.cursor) where.id = { [Op.lt]: filter.cursor };

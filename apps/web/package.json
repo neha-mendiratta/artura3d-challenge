@@ -1,0 +1,28 @@
+{
+  "name": "@artura/web",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "test": "npm test --prefix ../.. -- apps/web"
+  },
+  "dependencies": {
+    "@artura/shared": "^0.0.0",
+    "@mantine/core": "^9.6.3",
+    "@mantine/form": "^9.6.3",
+    "@mantine/hooks": "^9.6.3",
+    "@mantine/notifications": "^9.6.3",
+    "@tanstack/react-query": "^5.104.1",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "react-router": "^7.18.4"
+  },
+  "devDependencies": {
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.1",
+    "vite": "^8.3.2"
+  }
+}
