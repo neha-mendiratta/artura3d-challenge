@@ -117,6 +117,7 @@ The unique `order_id` makes this safe when two requests arrive at the same time:
 ### API documentation
 
 - **Swagger UI** at `GET /docs`, and the OpenAPI 3.1 document it reads at `GET /openapi.json`. Built in `apps/api/src/openapi.ts`.
+- **Spec file:** `apps/api/spec/openapi.yaml`, the same document as YAML, so the contract can be read in the repo without running the API. Generated with `npm run spec`; never edited by hand.
 - **Request bodies are generated from the shared Zod schemas** (`z.toJSONSchema`), so the documented rules (ranges, lengths, required fields, unknown fields rejected) are the rules the API enforces. Field descriptions live on the schema (`.meta`).
 - **Response shapes are written by hand.** A test checks they list the same fields as the models, and another that every route is documented and every documented route exists, so the docs cannot fall out of date unnoticed.
 
@@ -157,6 +158,7 @@ The unique `order_id` makes this safe when two requests arrive at the same time:
 | A model field added or removed without updating the docs | Test fails | `documents the same response fields as the models` |
 | Documented request rules | Same limits as the shared schema | `takes the request rules from the shared schema` |
 | Docs requested | `/openapi.json` returns the document; `/docs` shows Swagger UI | `serves the OpenAPI document and Swagger UI` |
+| API changed without regenerating `spec/openapi.yaml` | Test fails | `keeps the spec file up to date (run \`npm run spec\` after changing the API)` |
 
 Workflow rules (edit/submit/quote by status) are tested in spec 03.
 

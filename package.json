@@ -12,6 +12,7 @@
     "db:up": "docker compose up -d --wait db db-test",
     "db:down": "docker compose down",
     "db:migrate": "npm run migrate -w @artura/api",
+    "spec": "npm run spec -w @artura/api",
     "dev:api": "npm run dev -w @artura/api",
     "dev:web": "npm run dev -w @artura/web",
     "app:up": "docker compose up -d --build --wait api",
@@ -31,7 +32,8 @@
     "jest-environment-jsdom": "^30.5.2",
     "supertest": "^7.3.1",
     "ts-jest": "29.4.14",
-    "typescript": "6.0.3"
+    "typescript": "6.0.3",
+    "yaml": "^2.9.1"
   },
   "overrides": {
     "uuid": "^11.1.1"

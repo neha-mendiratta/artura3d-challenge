@@ -1,6 +1,9 @@
 import { DIMENSION_LIMITS } from '@artura/shared';
 import { Router } from 'express';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import request from 'supertest';
+import { parse } from 'yaml';
 import { app } from '../src/app';
 import { ManufacturingPacket } from '../src/models/manufacturing-packet';
 import { Order } from '../src/models/order';
@@ -50,6 +53,11 @@ describe('API docs', () => {
   test('takes the request rules from the shared schema', () => {
     const { widthMm } = openApiDocument.components.schemas.OrderInput.properties as Record<string, { maximum?: number }>;
     expect(widthMm?.maximum).toBe(DIMENSION_LIMITS.widthMm.max);
+  });
+
+  test('keeps the spec file up to date (run `npm run spec` after changing the API)', () => {
+    const specFile = parse(readFileSync(resolve(__dirname, '../spec/openapi.yaml'), 'utf8'));
+    expect(specFile).toEqual(openApiDocument);
   });
 
   test('serves the OpenAPI document and Swagger UI', async () => {

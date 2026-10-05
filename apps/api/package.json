@@ -5,7 +5,8 @@
   "scripts": {
     "test": "npm test --prefix ../.. -- apps/api",
     "migrate": "node --env-file=../../.env ../../node_modules/sequelize-cli/lib/sequelize db:migrate",
-    "dev": "tsx watch --env-file=../../.env src/server.ts"
+    "dev": "tsx watch --env-file=../../.env src/server.ts",
+    "spec": "tsx scripts/write-spec.ts"
   },
   "dependencies": {
     "@artura/shared": "^0.0.0",

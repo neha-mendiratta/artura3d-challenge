@@ -70,7 +70,9 @@ npm test             # type-checks the backend and frontend, then runs every tes
 | `POST /orders/{id}/quote` | Create the quote and the manufacturing packet (Submitted orders only) |
 | `GET /orders/{id}/packet` | Get the manufacturing packet and its status |
 
-**Interactive docs:** with the API running, open http://localhost:3000/docs (Swagger UI; the OpenAPI document is at `/openapi.json`). You can try each endpoint from there.
+**Interactive docs:** with the API running, open http://localhost:3000/docs (Swagger UI). You can try each endpoint from there.
+
+**Spec file:** [apps/api/spec/openapi.yaml](apps/api/spec/openapi.yaml) (OpenAPI 3.1), readable without running anything. It is generated from the code: after changing the API, run `npm run spec` (a test fails if you forget).
 
 Errors use one format: `{ "error": { "code", "message" } }`, with `code` one of `VALIDATION_ERROR` (400), `NOT_FOUND` (404), `CONFLICT` (409) or `INTERNAL_ERROR` (500). Full contract: [docs/specs/04-api.md](docs/specs/04-api.md).
 
@@ -79,7 +81,7 @@ Errors use one format: `{ "error": { "code", "message" } }`, with `code` one of 
 ## Project layout
 
 ```
-apps/api          Express API: routes, services (business rules), models, migrations, packet worker
+apps/api          Express API: routes, services (business rules), models, migrations, packet worker, OpenAPI spec (spec/)
 apps/web          React frontend: pages, components (incl. the 3D preview), hooks, API client
 packages/shared   Zod schemas, dimension limits and status types used by both apps
 docs/             plan, specs, decisions, conventions, recommendations
@@ -88,7 +90,7 @@ docs/             plan, specs, decisions, conventions, recommendations
 ## Docs
 
 - [docs/architecture.md](docs/architecture.md): diagrams of the system, the API layers, the data model, the quote → packet flow, and the recommended production setup
-- API reference: Swagger UI at http://localhost:3000/docs when the API is running
+- API reference: [apps/api/spec/openapi.yaml](apps/api/spec/openapi.yaml), or Swagger UI at http://localhost:3000/docs when the API is running
 - [docs/specs/](docs/specs/): one spec per feature, each with its edge cases and the test that covers each one
 - [docs/decisions.md](docs/decisions.md): decisions with reasons and alternatives
 - [docs/recommendations.md](docs/recommendations.md): improvements beyond the brief (scaling, queue-based workers, authentication, hosting)
