@@ -28,9 +28,18 @@ The data model already handles large tables (time-ordered ids, cursor pagination
 
 ## 3. Packet processing with a queue and serverless workers
 
-**Today:** a worker inside the API process polls the database every second.
+**Today:** a worker inside the API process polls the database every second and processes every Pending packet before waiting again. Each packet is one short transaction with indexed queries, and several instances share the work with `FOR UPDATE SKIP LOCKED`.
 
-**Recommendation for production at high volume:** the quote request puts a message on a queue (e.g. AWS SQS) and a serverless function (e.g. AWS Lambda) processes it. It scales automatically, has built-in retries and a dead-letter queue for failures, and keeps the work separate from the API.
+**First steps as volume grows (no new infrastructure):**
+
+- **Claim packets in batches** (e.g. `LIMIT 50`) instead of one at a time: fewer round trips per packet.
+- **A partial index** on `manufacturing_packets (id) WHERE status = 'Pending'`: it holds only the few Pending rows, so it stays small however many packets have been completed.
+
+**Recommendation for production at high volume:** the quote request puts a message on a queue (e.g. AWS SQS) and a serverless function (e.g. AWS Lambda) processes it. Work starts immediately with no polling, it scales automatically, has built-in retries and a dead-letter queue for failures, and keeps the work separate from the API.
+
+- **The packet table stays.** It holds each packet's status, payload and error for the UI and for support; the queue only replaces the polling.
+- **No lost messages (transactional outbox).** If the API saved the quote and then sent the message, a crash in between would leave a packet with no message. The Pending packet is already written in the same transaction as the quote, so it acts as the outbox: a small job sends any Pending packet that has not been queued yet.
+- **SNS only if several systems need the event** (e.g. manufacturing, clinic notifications, analytics): SNS fans one "order quoted" event out to one SQS queue per consumer. For a single consumer, SQS alone is enough.
 
 ## 4. Compiled production image
 
@@ -103,3 +112,9 @@ That is plenty here: each request runs a few short queries, so 5 connections ser
 
 - **Failed packets:** today a `Failed` packet is final, so the order can never reach manufacturing. Temporary database errors already stay `Pending` and are retried. Add a "Retry" action for support once the cause is fixed, or automatic retries with backoff through a queue (§3).
 - **Notes after the packet is built:** notes can change after submit, but the packet is a snapshot. Ask the business whether late notes must reach manufacturing; if so, send an update, or lock notes once the packet is `Completed`.
+
+## 12. Concurrent edits to a Draft (optimistic locking)
+
+**Today:** status changes are safe under concurrency (the status check is inside the `UPDATE`). But if two people edit the same Draft at the same time, the second save replaces the first: the last save wins, and the first person's change is lost without warning.
+
+**Recommendation:** add a `version` number to orders. The form sends the version it loaded; the update runs `WHERE id = ? AND version = ?` and increments it. If someone else saved in between, no row matches and the API returns 409; the page already reloads the order on a 409 and shows a message, so the user sees the latest values and can re-apply their change.

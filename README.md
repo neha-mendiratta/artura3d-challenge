@@ -70,6 +70,8 @@ npm test             # type-checks the backend and frontend, then runs every tes
 | `POST /orders/{id}/quote` | Create the quote and the manufacturing packet (Submitted orders only) |
 | `GET /orders/{id}/packet` | Get the manufacturing packet and its status |
 
+**Interactive docs:** with the API running, open http://localhost:3000/docs (Swagger UI; the OpenAPI document is at `/openapi.json`). You can try each endpoint from there.
+
 Errors use one format: `{ "error": { "code", "message" } }`, with `code` one of `VALIDATION_ERROR` (400), `NOT_FOUND` (404), `CONFLICT` (409) or `INTERNAL_ERROR` (500). Full contract: [docs/specs/04-api.md](docs/specs/04-api.md).
 
 **Pricing:** $100 base + $2 per mm of thickness + $0.50 per mm of width, +15% if expedited. Calculated in cents and rounded half up ([docs/specs/02-pricing.md](docs/specs/02-pricing.md)).
@@ -85,6 +87,8 @@ docs/             plan, specs, decisions, conventions, recommendations
 
 ## Docs
 
+- [docs/architecture.md](docs/architecture.md): diagrams of the system, the API layers, the data model, the quote → packet flow, and the recommended production setup
+- API reference: Swagger UI at http://localhost:3000/docs when the API is running
 - [docs/specs/](docs/specs/): one spec per feature, each with its edge cases and the test that covers each one
 - [docs/decisions.md](docs/decisions.md): decisions with reasons and alternatives
 - [docs/recommendations.md](docs/recommendations.md): improvements beyond the brief (scaling, queue-based workers, authentication, hosting)

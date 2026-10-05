@@ -114,6 +114,12 @@ In one transaction:
 
 The unique `order_id` makes this safe when two requests arrive at the same time: only one quote and one packet are ever created.
 
+### API documentation
+
+- **Swagger UI** at `GET /docs`, and the OpenAPI 3.1 document it reads at `GET /openapi.json`. Built in `apps/api/src/openapi.ts`.
+- **Request bodies are generated from the shared Zod schemas** (`z.toJSONSchema`), so the documented rules (ranges, lengths, required fields, unknown fields rejected) are the rules the API enforces. Field descriptions live on the schema (`.meta`).
+- **Response shapes are written by hand.** A test checks they list the same fields as the models, and another that every route is documented and every documented route exists, so the docs cannot fall out of date unnoticed.
+
 ## Edge cases
 
 | Situation | Expected | Test |
@@ -147,6 +153,10 @@ The unique `order_id` makes this safe when two requests arrive at the same time:
 | Invalid `status` or `cursor` in list query | 400 | `rejects an invalid list query` |
 | String instead of number or boolean (`"90"`, `"true"`) | 400 | `rejects wrong types` |
 | `PUT` with an invalid body on a Submitted order | 400 (body checked before status) | `validates the body before checking status` |
+| A route added or removed without updating the docs | Test fails | `documents every route, and only existing routes` |
+| A model field added or removed without updating the docs | Test fails | `documents the same response fields as the models` |
+| Documented request rules | Same limits as the shared schema | `takes the request rules from the shared schema` |
+| Docs requested | `/openapi.json` returns the document; `/docs` shows Swagger UI | `serves the OpenAPI document and Swagger UI` |
 
 Workflow rules (edit/submit/quote by status) are tested in spec 03.
 

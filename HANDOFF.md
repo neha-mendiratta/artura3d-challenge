@@ -38,7 +38,8 @@ pgAdmin: host `localhost`, port `5432`, database `artura`, user `artura`, passwo
 - Spec 07 (3D preview) approved: box model sized and coloured from the form, orbit controls, WebGL cleanup, measurement labels
 - Data model implemented: Sequelize migration (`apps/api/migrations`), models (`apps/api/src/models`), `config.ts`, `logger.ts`, `db.ts`; 11 tests pass against the test database
 - Pricing implemented: `apps/api/src/pricing.ts`, 4 unit tests
-- Security and test review: Docker ports on `127.0.0.1` only, database error details hidden in logs, failed packets store a plain message (connection errors stay `Pending`), patient ref hint, 8 missing edge-case tests added; production items in `docs/recommendations.md` §8–11; 133 tests in total
+- API docs and architecture: Swagger UI at `/docs` (`apps/api/src/openapi.ts`, request schemas generated from the shared Zod schema, tests check every route and model field is documented); `docs/architecture.md` with 5 Mermaid diagrams (system, API layers, data model, quote → packet flow, production on AWS); recommendations §3 expanded, §12 optimistic locking; 137 tests in total
+- Security and test review: Docker ports on `127.0.0.1` only, database error details hidden in logs, failed packets store a plain message (connection errors stay `Pending`), patient ref hint, 8 missing edge-case tests added; production items in `docs/recommendations.md` §8–11
 - 3D preview: `OrthoticPreview` (Canvas, lights, OrbitControls, redraws only on change) + `OrthoticModel` (box sized with scale, colour, 3 measurement labels), next to the form and fed by its live values, loaded only when a form is shown (`React.lazy`); `DIMENSION_LIMITS` shared
 - Order page workflow: `SubmitOrderButton` (confirmation dialog), `QuotePanel` (Generate quote, total), `PacketPanel` + `hooks/packet.ts` (polls every 2 s while Pending, then stops)
 - Order form: `components/OrderForm.tsx` (shared Zod schema via Mantine `schemaResolver`, locked except notes when Submitted), new order and order pages, `hooks/orders.ts` mutations, `query-client.ts` (global error notification), `constants.ts` (new order defaults)
@@ -61,7 +62,7 @@ Nothing.
 
 ## Next step
 
-Phase 5: README with setup instructions, interview talking points (`docs/talking-points.md`, including how the 3D works), final handoff.
+Phase 5: final `HANDOFF.md` (README is written).
 
 ## Open questions
 

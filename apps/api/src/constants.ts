@@ -7,4 +7,5 @@ export const EXPEDITE_PERCENT = 115;
 export const ORDERS_PAGE_SIZE = 20;
 
 export const PACKET_POLL_INTERVAL_MS = 1000;
-export const PACKET_FAILED_MESSAGE = 'The manufacturing packet could not be generated. The error has been logged for support.';
+export const PACKET_FAILED_MESSAGE =
+  'The manufacturing packet could not be generated. The error has been logged for support.';
