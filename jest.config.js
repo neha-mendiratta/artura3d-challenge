@@ -24,10 +24,18 @@ module.exports = {
       displayName: 'web',
       testEnvironment: '<rootDir>/apps/web/tests/setup/jsdom-environment.js',
       roots: ['<rootDir>/apps/web'],
+      // three is published as ES modules only, so its files are transformed too.
       transform: {
-        '^.+\\.tsx?$': ['ts-jest', { tsconfig: { rootDir: __dirname, jsx: 'react-jsx', module: 'commonjs', isolatedModules: true } }],
+        '^.+\\.[jt]sx?$': [
+          'ts-jest',
+          { tsconfig: { rootDir: __dirname, jsx: 'react-jsx', module: 'commonjs', allowJs: true, isolatedModules: true } },
+        ],
       },
-      moduleNameMapper: { '\\.css$': '<rootDir>/apps/web/tests/setup/style-stub.ts' },
+      transformIgnorePatterns: ['/node_modules/(?!three/)'],
+      moduleNameMapper: {
+        '\\.css$': '<rootDir>/apps/web/tests/setup/style-stub.ts',
+        '^three$': '<rootDir>/node_modules/three/build/three.module.js',
+      },
       setupFilesAfterEnv: ['<rootDir>/apps/web/tests/setup/jsdom.ts'],
     },
   ],

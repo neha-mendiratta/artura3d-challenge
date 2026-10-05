@@ -6,3 +6,9 @@ export type OrderListFilter = {
   status?: OrderStatus;
   cursor?: string;
 };
+
+export type DimensionLimit = {
+  label: string;
+  min: number;
+  max: number;
+};

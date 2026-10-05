@@ -17,3 +17,20 @@
 .muted {
   color: var(--mantine-color-dimmed);
 }
+
+.preview {
+  position: relative;
+  height: 360px;
+  border: 1px solid var(--mantine-color-gray-3);
+  border-radius: var(--mantine-radius-md);
+  background: var(--mantine-color-gray-0);
+}
+
+.dimension-label {
+  padding: 2px 6px;
+  border-radius: var(--mantine-radius-sm);
+  background: var(--mantine-color-white);
+  font-size: var(--mantine-font-size-xs);
+  white-space: nowrap;
+  pointer-events: none;
+}

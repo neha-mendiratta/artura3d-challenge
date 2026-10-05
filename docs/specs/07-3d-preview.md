@@ -1,6 +1,6 @@
 # 3D preview
 
-Status: Approved
+Status: Implemented
 
 ## Source
 
@@ -34,9 +34,11 @@ Each edge of the box shows its size in millimetres (e.g. `260 mm`, `90.5 mm`, `3
 
 Value for the user: an operations manager can check at a glance that the model matches the prescription, without reading the numbers off the form.
 
+The labels are given the preview's own container element (drei's `portal` option). Without it, drei attaches them to an element that changes while the canvas starts up, and a label can end up empty.
+
 ### Tests
 
-Jest with `@react-three/test-renderer`, which renders the scene without a browser or graphics card.
+Jest with `@react-three/test-renderer`, which renders the scene without a browser or graphics card. Other component and page tests replace `OrthoticPreview` with an empty stand-in, because jsdom has no WebGL.
 
 ## Edge cases
 
@@ -46,7 +48,7 @@ Jest with `@react-three/test-renderer`, which renders the scene without a browse
 | Dimension changes | Scale updates, same geometry object | `resizes without creating new geometry` |
 | Colour changes | Material colour updates | `changes the material colour` |
 | Empty or out-of-range dimension | Clamped to the allowed range | `clamps invalid dimensions` |
-| Labels | Show each dimension in mm and update | `shows measurement labels` |
+| Labels | Show each dimension in mm and update | `shows measurement labels and updates them` |
 | Component unmounts | Geometry and material `dispose()` called | `disposes WebGL resources on unmount` |
 
 ## Acceptance criteria

@@ -1,6 +1,7 @@
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { OrderForm } from '../../src/components/OrderForm';
+import { OrthoticPreview } from '../../src/components/OrthoticPreview';
 import { NEW_ORDER_DEFAULTS } from '../../src/constants';
 import { renderComponent } from '../helpers/render';
 
@@ -37,6 +38,22 @@ describe('OrderForm', () => {
     expect(screen.getByLabelText('Expedite (+15%)')).toBeDisabled();
     expect(screen.getByLabelText('Notes')).toBeEnabled();
     expect(screen.getByRole('button', { name: 'Save notes' })).toBeInTheDocument();
+  });
+
+  test('passes the current values to the 3D preview as the user types', async () => {
+    renderComponent(<OrderForm initialValues={values} locked={false} saving={false} onSave={jest.fn()} />);
+
+    const length = screen.getByLabelText('Length (mm)');
+    await userEvent.clear(length);
+    await userEvent.type(length, '300');
+
+    // OrthoticPreview is the empty stand-in from tests/setup/jsdom.ts; this reads its latest props.
+    expect(jest.mocked(OrthoticPreview).mock.lastCall?.[0]).toEqual({
+      lengthMm: 300,
+      widthMm: values.widthMm,
+      thicknessMm: values.thicknessMm,
+      colour: values.colour,
+    });
   });
 
   test('disables the button while saving', () => {

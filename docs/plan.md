@@ -86,9 +86,9 @@ Edge cases are never out of scope: see [conventions.md](conventions.md).
 
 ### Phase 4: 3D preview
 
-- [ ] Model, dimension controls, colour, orbit controls
-- [ ] WebGL cleanup
-- [ ] Measurement labels
+- [x] Model, dimension controls, colour, orbit controls
+- [x] WebGL cleanup
+- [x] Measurement labels
 
 ### Phase 5: Wrap-up
 

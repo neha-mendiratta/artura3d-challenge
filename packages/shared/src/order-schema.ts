@@ -1,9 +1,11 @@
 import { z } from 'zod';
+import { DIMENSION_LIMITS } from './dimension-limits';
+import { DimensionLimit } from './types';
 
 const hasAtMostOneDecimal = (value: number) => Math.abs(value * 10 - Math.round(value * 10)) < 1e-9;
 
 // Messages are written for the person filling in the form; the API returns the same ones.
-const dimension = (label: string, min: number, max: number) => {
+const dimension = ({ label, min, max }: DimensionLimit) => {
   const range = `${label} must be between ${min} and ${max} mm`;
   return z
     .number({ error: `${label} must be a number` })
@@ -27,9 +29,9 @@ export const orderInputSchema = z.strictObject({
     .trim()
     .min(1, 'Patient ref is required')
     .max(50, 'Patient ref must be 50 characters or fewer'),
-  lengthMm: dimension('Length', 150, 350),
-  widthMm: dimension('Width', 50, 150),
-  thicknessMm: dimension('Thickness', 1, 15),
+  lengthMm: dimension(DIMENSION_LIMITS.lengthMm),
+  widthMm: dimension(DIMENSION_LIMITS.widthMm),
+  thicknessMm: dimension(DIMENSION_LIMITS.thicknessMm),
   colour: z
     .string()
     .regex(/^#[0-9a-fA-F]{6}$/, 'Colour must be a hex colour like #3366FF')

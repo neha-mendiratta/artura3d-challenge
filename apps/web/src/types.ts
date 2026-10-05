@@ -1,4 +1,5 @@
 import { OrderInput, OrderStatus, PacketStatus } from '@artura/shared';
+import { RefObject } from 'react';
 
 export type Quote = {
   id: string;
@@ -59,3 +60,16 @@ export type StatusBadgeProps = { status: OrderStatus | PacketStatus };
 export type OrderProps = { order: Order };
 
 export type OrderIdProps = { orderId: string };
+
+// What the 3D preview shows: the form's current values, which may be mid-edit (empty or out of range).
+export type OrthoticPreviewProps = {
+  lengthMm: number;
+  widthMm: number;
+  thicknessMm: number;
+  colour: string;
+};
+
+export type OrthoticModelProps = OrthoticPreviewProps & {
+  // A fixed element for the measurement labels (see OrthoticPreview).
+  labelContainer: RefObject<HTMLElement>;
+};

@@ -35,3 +35,4 @@ Short log. Newest at the bottom.
 | 29 | tsx to run the API (development and the Docker image) | Runs TypeScript directly, including the shared package's TypeScript source; no build step to configure | ts-node; compiling to JavaScript first (see recommendations) |
 | 30 | React Testing Library + jsdom for frontend tests | Tests render components and interact like a user (find by text and role, click, type); jsdom simulates the browser in Jest | Testing implementation details (component state) |
 | 31 | Plain `fetch` in one small API client | Built into the browser; one wrapper handles JSON and turns API errors into readable messages | axios |
+| 32 | Dimension limits defined once in `packages/shared` (`DIMENSION_LIMITS`) | Used by the validation schema, the form inputs and the 3D preview; a range cannot differ between them | Repeating the numbers in each place |
