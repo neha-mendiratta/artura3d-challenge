@@ -93,4 +93,4 @@ Edge cases are never out of scope: see [conventions.md](conventions.md).
 ### Phase 5: Wrap-up
 
 - [x] README with setup instructions
-- [ ] Final `HANDOFF.md`
+- [x] Final `HANDOFF.md`
